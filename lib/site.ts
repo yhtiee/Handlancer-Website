@@ -7,8 +7,11 @@
  * away from what the product actually does.
  */
 
-/** Change this one constant when the real domain is registered. */
-export const SITE_URL = 'https://handlancer.vercel.app/';
+const rawSiteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://handlancer.vercel.app');
+
+export const SITE_URL = rawSiteUrl.endsWith('/') ? rawSiteUrl.slice(0, -1) : rawSiteUrl;
 
 export const SITE = {
   name: 'HandLancer',

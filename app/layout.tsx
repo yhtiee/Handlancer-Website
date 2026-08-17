@@ -80,9 +80,11 @@ export const metadata: Metadata = {
     description: SITE.description,
     images: [
       {
-        url: '/handlancer-preview.png',
+        url: `${SITE_URL}/handlancer-preview.png`,
+        secureUrl: `${SITE_URL}/handlancer-preview.png`,
         width: 1200,
         height: 630,
+        type: 'image/png',
         alt: 'HandLancer — Hire Trusted Artisans in Nigeria, Pay Only for Work Done',
       },
     ],
@@ -91,7 +93,7 @@ export const metadata: Metadata = {
     card: 'summary_large_image',
     title: TITLE,
     description: SITE.shortDescription,
-    images: ['/handlancer-preview.png'],
+    images: [`${SITE_URL}/handlancer-preview.png`],
   },
   robots: {
     index: true,
