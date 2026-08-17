@@ -8,7 +8,7 @@
  */
 
 /** Change this one constant when the real domain is registered. */
-export const SITE_URL = 'https://handlancer.ng';
+export const SITE_URL = 'https://handlancer.vercel.app/';
 
 export const SITE = {
   name: 'HandLancer',
