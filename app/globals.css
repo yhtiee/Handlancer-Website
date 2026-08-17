@@ -1,26 +1,331 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   HandLancer — editorial ledger
+   --------------------------------------------------------------------------
+   Tokens are the mobile app's LIGHT theme (src/constants/theme.ts). The app is
+   userInterfaceStyle:"automatic", so light is as native to the brand as dark —
+   and a paper canvas is what keeps this from reading like every other dark,
+   teal-glow SaaS page.
+
+   Deliberately absent: gradient text, backdrop blur, glow blobs, and the
+   label-pill-above-every-headline pattern. Structure comes from hairline rules,
+   whitespace and alternating paper bands instead.
+   ========================================================================== */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Colors.light, verbatim */
+  --ink: #10151b;
+  --paper: #fbfcfd;
+  --band: #f1f4f6;
+  --band-deep: #e4e9ec;
+  --muted: #5b6772;
+  --rule: #e5e9ec;
+  --teal: #0fb5a4;
+  --navy: #1e3a5f;
+  --ok: #16a34a;
+  --warn: #c77700;
+  --bad: #e5484d;
+
+  /* Derived, used sparingly */
+  --teal-wash: #e7f7f5;
+  --navy-wash: #eaeff5;
+  --rule-strong: #c9d2d8;
+
+  /* Text-safe variants. --teal is 2.3:1 on paper and --ok is 3.0:1, so both are
+     fills/graphics only; these are their legible counterparts for type. */
+  --ok-ink: #0e6b33;   /* 6.0:1 on --band */
+
+  /* Hero stage — white falling to grey, with a drafting grid over it. */
+  --stage-top: #ffffff;
+  --stage-bot: #e7ecf0;
+  --grid-line: rgba(16, 21, 27, 0.055);
+  --grid-line-hot: rgba(30, 58, 95, 0.26);
+  --grid-cell: 72px;
+
+  /* 4pt grid, from the app's Spacing scale */
+  --s1: 4px; --s2: 8px; --s3: 16px; --s4: 24px; --s5: 32px; --s6: 64px;
+
+  color-scheme: light;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-band: var(--band);
+  --color-muted: var(--muted);
+  --color-rule: var(--rule);
+  --color-teal: var(--teal);
+  --color-navy: var(--navy);
+
+  --font-display: var(--font-spline), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-newsreader), Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 88px;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-spline), ui-sans-serif, system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: clip;
+}
+
+h1, h2, h3, h4 {
+  font-family: var(--font-spline), ui-sans-serif, system-ui, sans-serif;
+  font-weight: 700;
+  color: var(--navy);
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+/* Serif italic carries emphasis instead of a gradient. */
+em, .lede em, h1 em, h2 em, h3 em {
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+  color: var(--navy);
+}
+
+.lede {
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: clamp(1.12rem, 1.9vw, 1.34rem);
+  line-height: 1.55;
+  color: var(--muted);
+  font-weight: 380;
+}
+
+::selection { background: var(--teal); color: #06201d; }
+
+:focus-visible {
+  outline: 2px solid var(--navy);
+  outline-offset: 2px;
+}
+
+/* ==========================================================================
+   Layout
+   ========================================================================== */
+
+.shell {
+  width: 100%;
+  max-width: 1180px;
+  margin-inline: auto;
+  padding-inline: 22px;
+}
+@media (min-width: 900px) { .shell { padding-inline: 40px; } }
+
+/* Alternating bands do the work that dividers would. */
+.band { background: var(--band); }
+
+/* Hairline rules — the structural motif. */
+.rule { border-top: 1px solid var(--rule); }
+.rule-b { border-bottom: 1px solid var(--rule); }
+
+/* ==========================================================================
+   Editorial pieces
+   ========================================================================== */
+
+/* Section marker: "01 / HOW IT WORKS" — set in mono, sitting on a rule.
+   Distinct from a pill label: it is structural numbering, not decoration. */
+.marker {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding-top: 14px;
+  border-top: 1.5px solid var(--ink);
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.marker b { color: var(--ink); font-weight: 600; }
+
+/* Figures — every naira amount and metric. */
+.figure {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Flat bordered cell. No lift, no glow, no shadow. */
+.cell {
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+.cell:hover { border-color: var(--rule-strong); }
+
+/* Primary action: teal fill, near-black ink (7.1:1). */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 13px 22px;
+  border-radius: 6px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+.btn-primary { background: var(--teal); color: #06201d; }
+.btn-primary:hover { background: #0da294; }
+.btn-ghost { border: 1px solid var(--rule-strong); color: var(--ink); background: transparent; }
+.btn-ghost:hover { border-color: var(--ink); background: var(--band); }
+
+/* Underline that grows on hover — used on text links. */
+.ulink {
+  color: var(--navy);
+  font-weight: 600;
+  text-decoration: none;
+  background-image: linear-gradient(var(--teal), var(--teal));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 100% 2px;
+  padding-bottom: 2px;
+  transition: background-size 200ms ease;
+}
+.ulink:hover { background-size: 100% 6px; }
+
+/* ---- Hero stage: white falling to grey, over a drafting grid ---- */
+
+.stage {
+  background:
+    radial-gradient(120% 90% at 50% 0%, #ffffff 0%, transparent 60%),
+    linear-gradient(180deg, var(--stage-top) 0%, #f4f7f9 52%, var(--stage-bot) 100%);
+}
+
+/* Layer 1 — the grid, always visible, very faint. */
+.stage-grid {
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid-cell) var(--grid-cell);
+  mask-image: radial-gradient(ellipse 78% 72% at 50% 42%, #000 30%, transparent 82%);
+  -webkit-mask-image: radial-gradient(ellipse 78% 72% at 50% 42%, #000 30%, transparent 82%);
+}
+
+/* Layer 2 — the same grid inked in navy, revealed only around the pointer, so
+   the drawing "develops" under the cursor. --mx/--my are written by hero.tsx
+   inside a rAF; opacity is driven by --hot so leaving the section fades it out. */
+.stage-grid-hot {
+  background-image:
+    linear-gradient(var(--grid-line-hot) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line-hot) 1px, transparent 1px);
+  background-size: var(--grid-cell) var(--grid-cell);
+  mask-image: radial-gradient(circle 200px at var(--mx, -999px) var(--my, -999px), #000 0%, rgba(0,0,0,.45) 45%, transparent 72%);
+  -webkit-mask-image: radial-gradient(circle 200px at var(--mx, -999px) var(--my, -999px), #000 0%, rgba(0,0,0,.45) 45%, transparent 72%);
+  opacity: var(--hot, 0);
+  transition: opacity 420ms ease;
+}
+
+/* Layer 3 — the single cell the pointer is inside, snapped to the grid. */
+.stage-cell {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: var(--grid-cell);
+  height: var(--grid-cell);
+  background: rgba(15, 181, 164, 0.11);
+  border: 1px solid rgba(15, 181, 164, 0.4);
+  transform: translate3d(var(--cx, -999px), var(--cy, -999px), 0);
+  opacity: var(--hot, 0);
+  transition: transform 130ms cubic-bezier(0.2, 0.7, 0.3, 1), opacity 420ms ease;
+}
+
+/* Coarse pointers get the static grid only — there is no cursor to follow. */
+@media (pointer: coarse) {
+  .stage-grid-hot, .stage-cell { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .stage-cell { transition: opacity 420ms ease; }
+}
+
+/* Thin rule with the label sitting inside it — an editorial kicker, not a pill. */
+.kicker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 11.5px;
+  font-weight: 500;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+.kicker::before,
+.kicker::after {
+  content: '';
+  height: 1px;
+  width: clamp(24px, 7vw, 72px);
+  background: currentColor;
+  opacity: 0.35;
+}
+
+/* Console/log block — the escrow ledger read-out. */
+.log {
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 12.5px;
+  line-height: 1.85;
+  background: #0f1720;
+  color: #cbd6e0;
+  border-radius: 8px;
+  overflow-x: auto;
+}
+.log .t { color: #7c8b99; }
+.log .ok { color: #4ade9b; }
+.log .hold { color: #4dd3c4; }
+.log .amt { color: #f2f5f7; font-weight: 600; }
+
+/* ==========================================================================
+   Motion — restrained
+   ========================================================================== */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 620ms cubic-bezier(0.2, 0.7, 0.3, 1),
+              transform 620ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+}
+[data-reveal="in"] { opacity: 1; transform: none; }
+
+@keyframes hl-marquee {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: hl-marquee var(--marquee-duration, 78s) linear infinite;
+}
+.marquee:hover .marquee-track { animation-play-state: paused; }
+
+@keyframes hl-caret { 0%, 45% { opacity: 1; } 55%, 100% { opacity: 0; } }
+.caret { animation: hl-caret 1.1s steps(1) infinite; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  [data-reveal] { opacity: 1; transform: none; }
+  .marquee-track { animation: none; }
 }
