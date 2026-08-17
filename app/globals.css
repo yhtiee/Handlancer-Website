@@ -286,6 +286,7 @@ em, .lede em, h1 em, h2 em, h3 em {
   color: #cbd6e0;
   border-radius: 8px;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 .log .t { color: #7c8b99; }
 .log .ok { color: #4ade9b; }

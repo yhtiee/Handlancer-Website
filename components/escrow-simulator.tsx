@@ -162,7 +162,7 @@ export function EscrowSimulator() {
 
         {/* ---------------- Panel ---------------- */}
         <Reveal delay={120} className="mt-12">
-          <div className="border border-[var(--rule-strong)] bg-[var(--paper)]">
+          <div className="overflow-hidden border border-[var(--rule-strong)] bg-[var(--paper)]">
             {/* Balances */}
             <div className="grid divide-y divide-[var(--rule)] sm:grid-cols-3 sm:divide-x sm:divide-y-0">
               <Balance label="Your wallet" amount={step.wallet} note="Topped up via Flutterwave" />
@@ -205,7 +205,7 @@ export function EscrowSimulator() {
             </div>
 
             {/* Steps + detail */}
-            <div className="grid border-t border-[var(--rule)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+            <div className="grid min-w-0 border-t border-[var(--rule)] lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
               <ol className="divide-y divide-[var(--rule)] border-b border-[var(--rule)] lg:border-b-0 lg:border-r">
                 {STEPS.map((s, n) => {
                   const current = n === i;
@@ -234,7 +234,7 @@ export function EscrowSimulator() {
                           >
                             {s.title}
                           </span>
-                          <code className="font-[family-name:var(--font-plex-mono)] text-[11px] text-[var(--muted)]">
+                          <code className="block truncate font-[family-name:var(--font-plex-mono)] text-[11px] text-[var(--muted)]">
                             {s.rpc}
                           </code>
                         </span>
@@ -244,7 +244,7 @@ export function EscrowSimulator() {
                 })}
               </ol>
 
-              <div className="flex flex-col p-5 sm:p-7">
+              <div className="flex flex-col min-w-0 p-5 sm:p-7">
                 <p className="font-[family-name:var(--font-plex-mono)] text-[11px] uppercase tracking-[0.13em] text-[var(--muted)]">
                   {step.actor} action
                 </p>
@@ -254,7 +254,7 @@ export function EscrowSimulator() {
                 </p>
 
                 {/* Ledger log — accumulates as you advance. */}
-                <div className="log mt-6 p-4">
+                <div className="log mt-6 max-w-full overflow-x-auto p-4">
                   {STEPS.slice(0, i + 1).map((s) => (
                     <div key={s.rpc} className="whitespace-nowrap">
                       <span className="t">[{s.log.at}]</span>{' '}
