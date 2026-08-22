@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { IBM_Plex_Mono, Newsreader, Spline_Sans } from 'next/font/google';
 import './globals.css';
-import { SITE, SITE_URL, buildJsonLd, CATEGORIES, CITIES } from '@/lib/site';
+import { SITE, SITE_URL, buildJsonLd } from '@/lib/site';
 
 /*
  * Three faces, three jobs. Inter is deliberately not among them — it is the
@@ -40,60 +40,43 @@ export const viewport: Viewport = {
   // No maximumScale/userScalable — pinch-zoom must stay available.
 };
 
-const TITLE = 'HandLancer — Hire Trusted Artisans in Nigeria, Pay Only for Work Done';
+export const HOME_TITLE = 'HandLancer — Hire Trusted Artisans in Nigeria, Pay Only for Work Done';
 
+/*
+ * Site-wide defaults only. Anything that must be unique per route — the
+ * canonical, og:url, and the page title/description — is built per page by
+ * lib/seo.ts. In particular there is NO `alternates` here: metadata merges
+ * shallowly, so an inherited `canonical: '/'` would point every sub-page at the
+ * homepage.
+ *
+ * Open Graph and Twitter images come from the app/opengraph-image.png and
+ * app/twitter-image.png file conventions, which resolve against metadataBase
+ * and carry their own width/height/type. Declaring them here as absolute URLs
+ * (as this file used to) bypasses metadataBase entirely.
+ */
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: TITLE,
+    default: HOME_TITLE,
     template: '%s | HandLancer',
   },
   description: SITE.description,
   applicationName: SITE.name,
   category: 'business',
-  keywords: [
-    'hire artisans Nigeria',
-    'find a plumber near me',
-    'electrician near me Lagos',
-    'carpenter Nigeria',
-    'home services app Nigeria',
-    'escrow payment artisans',
-    'handyman app Nigeria',
-    'AC repair Lagos',
-    'cleaning services Abuja',
-    'artisan marketplace',
-    'skilled workers Nigeria',
-    'HandLancer',
-    ...CATEGORIES.flatMap((c) => c.searches),
-    ...CITIES.map((c) => `artisans in ${c}`),
-  ],
   authors: [{ name: SITE.name, url: SITE_URL }],
   creator: SITE.name,
   publisher: SITE.name,
-  alternates: { canonical: '/' },
   openGraph: {
     type: 'website',
     locale: 'en_NG',
-    url: SITE_URL,
     siteName: SITE.name,
-    title: TITLE,
+    title: HOME_TITLE,
     description: SITE.description,
-    images: [
-      {
-        url: `${SITE_URL}/handlancer-preview.png`,
-        secureUrl: `${SITE_URL}/handlancer-preview.png`,
-        width: 1200,
-        height: 630,
-        type: 'image/png',
-        alt: 'HandLancer — Hire Trusted Artisans in Nigeria, Pay Only for Work Done',
-      },
-    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: TITLE,
+    title: HOME_TITLE,
     description: SITE.shortDescription,
-    images: [`${SITE_URL}/handlancer-preview.png`],
   },
   robots: {
     index: true,
