@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { IBM_Plex_Mono, Newsreader, Spline_Sans } from 'next/font/google';
 import './globals.css';
-import { SITE, SITE_URL, buildJsonLd } from '@/lib/site';
+import { SITE, SITE_URL } from '@/lib/site';
+import { jsonLdGraph, organizationSchema, websiteSchema } from '@/lib/schema';
+import { JsonLd } from '@/components/json-ld';
 
 /*
  * Three faces, three jobs. Inter is deliberately not among them — it is the
@@ -106,11 +108,9 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
           <style>{`[data-reveal]{opacity:1 !important;transform:none !important}`}</style>
         </noscript>
         {children}
-        <script
-          type="application/ld+json"
-          // Structured data is a static object we build ourselves — no user input.
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(buildJsonLd()) }}
-        />
+        {/* Site-wide only. Page-specific schema (FAQPage, ItemList, Service,
+            BreadcrumbList) is emitted by the page that shows that content. */}
+        <JsonLd graph={jsonLdGraph(organizationSchema(), websiteSchema())} />
       </body>
     </html>
   );
