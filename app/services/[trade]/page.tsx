@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { CATEGORIES, SITE } from '@/lib/site';
 import { CITY_PAGES, isIndexable } from '@/lib/cities';
+import { hasOwnPage, servicesForCategory } from '@/lib/services';
 import { guidesForTrade } from '@/lib/guides';
 import { buildMetadata } from '@/lib/seo';
 import { breadcrumbSchema, jsonLdGraph, serviceSchema } from '@/lib/schema';
@@ -49,6 +50,7 @@ export default async function TradePage({ params }: { params: Promise<{ trade: s
   const path = `/services/${category.slug}`;
   const Icon = CATEGORY_ICONS[category.id] ?? IconGrid;
   const guides = guidesForTrade(category.slug);
+  const services = servicesForCategory(category.id);
 
   // Only cities whose content for this trade clears the gate get linked.
   const cities = CITY_PAGES.filter((city) =>
@@ -114,6 +116,61 @@ export default async function TradePage({ params }: { params: Promise<{ trade: s
                 </p>
               </div>
             </Reveal>
+
+            {/* The full catalogue for this trade. Services with their own page
+                link to it; the rest are listed as plain text. Listing them all
+                is the point — it is what stops the category page from being a
+                stub, and it is honest about everything we connect people to. */}
+            {services.length > 0 && (
+              <div className="mt-14 border-t border-[var(--rule)] pt-8">
+                <p className="font-[family-name:var(--font-plex-mono)] text-[11px] uppercase tracking-[0.13em] text-[var(--muted)]">
+                  {services.length} {category.label.toLowerCase()} services
+                </p>
+                <ul className="mt-6 grid gap-px border border-[var(--rule)] sm:grid-cols-2 lg:grid-cols-3"
+                    style={{ background: 'var(--rule)' }}>
+                  {services.map((s, i) => {
+                    const paged = hasOwnPage(s);
+                    const inner = (
+                      <>
+                        <span className="flex items-baseline justify-between gap-3">
+                          <span
+                            className={`text-[15px] font-semibold ${paged ? 'text-[var(--navy)]' : 'text-[var(--ink)]'}`}
+                          >
+                            {s.label}
+                          </span>
+                          {paged && (
+                            <IconArrowRight className="h-4 w-4 shrink-0 text-[var(--muted)]" />
+                          )}
+                        </span>
+                        <span className="mt-1.5 block max-w-[38ch] text-[13.5px] leading-relaxed text-[var(--muted)]">
+                          {s.blurb}
+                        </span>
+                      </>
+                    );
+                    return (
+                      <Reveal key={s.slug} delay={(i % 3) * 40}>
+                        <li className="h-full list-none">
+                          {paged ? (
+                            <Link
+                              href={`/services/${category.slug}/${s.slug}`}
+                              className="flex h-full flex-col bg-[var(--paper)] p-5 transition-colors duration-200 hover:bg-[var(--band)]"
+                            >
+                              {inner}
+                            </Link>
+                          ) : (
+                            <div className="flex h-full flex-col bg-[var(--paper)] p-5">{inner}</div>
+                          )}
+                        </li>
+                      </Reveal>
+                    );
+                  })}
+                </ul>
+                <p className="mt-5 max-w-[58ch] text-[14px] leading-relaxed text-[var(--muted)]">
+                  Not seeing yours? Post the job anyway — {SITE.name} matches on what you describe,
+                  not on a fixed menu, and artisans list their own skills.
+                </p>
+              </div>
+            )}
 
             <div className="mt-14 grid gap-x-10 gap-y-8 border-t border-[var(--rule)] sm:grid-cols-3">
               {[

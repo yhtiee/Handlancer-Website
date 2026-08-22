@@ -15,6 +15,7 @@
 import type { MetadataRoute } from 'next';
 import { CATEGORIES } from '@/lib/site';
 import { CITY_PAGES, indexableCityTradePairs } from '@/lib/cities';
+import { allPagedServices } from '@/lib/services';
 import { GUIDES, guidesLastUpdated } from '@/lib/guides';
 
 type ChangeFrequency = NonNullable<MetadataRoute.Sitemap[number]['changeFrequency']>;
@@ -46,6 +47,16 @@ export function siteRoutes(): SiteRoute[] {
         priority: 0.8,
       }),
     ),
+
+    /* Individual services — only those that cleared hasOwnPage() */
+    ...allPagedServices().map((s): SiteRoute => {
+      const category = CATEGORIES.find((c) => c.id === s.category);
+      return {
+        path: `/services/${category?.slug ?? ''}/${s.slug}`,
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      };
+    }),
 
     /* City hubs */
     ...CITY_PAGES.map(

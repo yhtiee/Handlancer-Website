@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CATEGORIES } from '@/lib/site';
+import { SERVICE_COUNT, servicesForCategory } from '@/lib/services';
 import { buildMetadata } from '@/lib/seo';
 import { breadcrumbSchema, jsonLdGraph, serviceListSchema } from '@/lib/schema';
 import { JsonLd } from '@/components/json-ld';
@@ -46,7 +47,7 @@ export default function ServicesIndex() {
               Twelve trades. <em>One job post.</em>
             </>
           }
-          lede="From a burst pipe at midnight to a full kitchen refit. Post once and let verified artisans near you compete with itemised quotes."
+          lede={`From a burst pipe at midnight to a full kitchen refit — ${SERVICE_COUNT} services across twelve trades. Post once and let verified artisans near you compete with itemised quotes.`}
           trail={trail}
         />
 
@@ -79,6 +80,9 @@ export default function ServicesIndex() {
                       </p>
                       <p className="mt-4 max-w-[36ch] border-t border-[var(--rule)] pt-3.5 text-[13.5px] leading-relaxed text-[var(--muted)]">
                         {c.demand}
+                      </p>
+                      <p className="mt-3 font-[family-name:var(--font-plex-mono)] text-[11px] uppercase tracking-[0.13em] text-[var(--muted)]">
+                        {servicesForCategory(c.id).length} services
                       </p>
                     </Link>
                   </Reveal>
