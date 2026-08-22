@@ -45,16 +45,9 @@ export function Services() {
                   <p className="mt-2.5 max-w-[34ch] text-[14.5px] leading-relaxed text-[var(--muted)]">
                     {c.blurb}
                   </p>
-                  <ul className="mt-4 flex flex-wrap gap-x-3 gap-y-1.5 border-t border-[var(--rule)] pt-3.5">
-                    {c.searches.slice(0, 2).map((s) => (
-                      <li
-                        key={s}
-                        className="font-[family-name:var(--font-plex-mono)] text-[11.5px] text-[var(--muted)]"
-                      >
-                        {s}
-                      </li>
-                    ))}
-                  </ul>
+                  <p className="mt-4 max-w-[36ch] border-t border-[var(--rule)] pt-3.5 text-[13.5px] leading-relaxed text-[var(--muted)]">
+                    {c.demand}
+                  </p>
                 </article>
               </Reveal>
             );
@@ -100,13 +93,24 @@ export function Services() {
           }}
         >
           <ul className="marquee-track gap-3">
-            {[...TRADES, ...TRADES].map((t, i) => (
-              <li key={`${t.slug}-${i}`} className="w-[196px] shrink-0 sm:w-[224px]">
+            {[...TRADES, ...TRADES].map((t, i) => {
+              /* The set is duplicated so the -50% loop is seamless. The copy is
+                 decoration: hide it from assistive tech and crawlers, or all
+                 sixteen artisans get announced twice. */
+              const isLoopCopy = i >= TRADES.length;
+              return (
+              <li
+                key={`${t.slug}-${i}`}
+                aria-hidden={isLoopCopy || undefined}
+                className="w-[196px] shrink-0 sm:w-[224px]"
+              >
                 <figure>
                   <div className="overflow-hidden rounded-sm border border-[var(--rule)]">
                     <Image
                       src={`/brand/providers/${t.slug}.webp`}
-                      alt={`${t.label} available for hire on HandLancer in Nigeria`}
+                      alt={
+                        isLoopCopy ? '' : `${t.label} available for hire on HandLancer in Nigeria`
+                      }
                       width={224}
                       height={272}
                       loading="lazy"
@@ -122,7 +126,8 @@ export function Services() {
                   </figcaption>
                 </figure>
               </li>
-            ))}
+              );
+            })}
           </ul>
         </div>
       </div>
