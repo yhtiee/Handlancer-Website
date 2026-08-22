@@ -7,9 +7,11 @@
  * away from what the product actually does.
  */
 
-const rawSiteUrl =
-  process.env.NEXT_PUBLIC_SITE_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://handlancer.vercel.app');
+// const rawSiteUrl =
+//   process.env.NEXT_PUBLIC_SITE_URL ||
+//   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://handlancer.vercel.app');
+
+const rawSiteUrl = 'https://www.handlancer.com/'
 
 export const SITE_URL = rawSiteUrl.endsWith('/') ? rawSiteUrl.slice(0, -1) : rawSiteUrl;
 
