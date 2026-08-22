@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import { HOME_TITLE } from './layout';
 import { buildMetadata } from '@/lib/seo';
-import { SITE } from '@/lib/site';
+import { SITE, FAQS } from '@/lib/site';
+import { faqPageSchema, jsonLdGraph, serviceListSchema } from '@/lib/schema';
+import { JsonLd } from '@/components/json-ld';
 import { Nav } from '@/components/nav';
 import { Hero } from '@/components/hero';
 import { EscrowSimulator } from '@/components/escrow-simulator';
@@ -24,6 +26,9 @@ export default function Page() {
   return (
     <>
       <Nav />
+      {/* Both nodes describe content rendered below: the 12 category cards in
+          <Services /> and the accordion in <Faq />, which is driven by FAQS. */}
+      <JsonLd graph={jsonLdGraph(serviceListSchema('/'), faqPageSchema(FAQS, '/'))} />
       <main className="flex-1">
         <Hero />
         <EscrowSimulator />

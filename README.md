@@ -104,13 +104,39 @@ to match.
 
 ## SEO
 
-- Metadata + Open Graph + Twitter card in `app/layout.tsx`; preview image set to `public/handlancer-preview.png` (`app/opengraph-image.png` and `app/twitter-image.png`).
-- `app/sitemap.ts`, `app/robots.ts`, `app/manifest.ts`.
-- JSON-LD `@graph`: Organization, WebSite, MobileApplication, ItemList (12
-  services × 12 cities), FAQPage (9 Q&As), BreadcrumbList.
-- One `<h1>`, semantic section headings, alt text on every image.
+- **Origin.** `NEXT_PUBLIC_SITE_URL` (see `.env.example`) is the single source of
+  truth, read once in `lib/site.ts`. It drives `metadataBase`, every canonical,
+  `og:url`, the sitemap and `robots.txt`. No `VERCEL_URL` fallback — preview
+  builds must never emit canonicals on a `*.vercel.app` origin.
+- **Per-page metadata.** `lib/seo.ts` → `buildMetadata({ path, title, … })`.
+  Every route must call it. Metadata merges *shallowly* in Next, so a nested
+  `openGraph` from the layout is replaced wholesale by any page that redefines
+  it — the builder always emits a complete block. The root layout deliberately
+  sets **no** `alternates`, so no page can inherit the homepage's canonical.
+- **Social images** come from the `app/opengraph-image.png` /
+  `app/twitter-image.png` file conventions (alt text in the matching
+  `.alt.txt`), which resolve against `metadataBase` and carry their own
+  dimensions. Do not hand-write absolute image URLs — that bypasses
+  `metadataBase`.
+- **Crawl.** `app/robots.ts` (allow all but `/api/`), `app/sitemap.ts` generated
+  from `lib/routes.ts`, `app/manifest.ts`. Never put a `#fragment` in the
+  sitemap; engines strip it and you end up declaring one URL many times.
+- **Structured data.** `lib/schema.ts` holds typed builders; `components/json-ld.tsx`
+  renders them. Site-wide nodes (Organization, WebSite) are emitted in
+  `app/layout.tsx`; page-level nodes (FAQPage, ItemList, Service,
+  BreadcrumbList) are emitted by the page that shows that content. Nodes
+  cross-reference by `@id`, and Google merges every `ld+json` block on a page,
+  so a page-level node can point at the layout's Organization.
+  > **Rule:** every schema node must describe something visible on the page that
+  > emits it. `MobileApplication` was removed for claiming a shipped app with an
+  > `Offer` while `SITE.launched` is still `false`.
+- One `<h1>` per page, headings descend without skipping, alt text on every
+  image. The provider marquee duplicates its items for the CSS loop; the copies
+  are `aria-hidden` with an empty `alt`.
 - FAQ answers are collapsed with CSS grid rows, never unmounted, so crawlers read
   the same text that backs the FAQPage schema.
+- No keyword meta tag and no visible keyword lists. Cards carry a conversational
+  `demand` sentence instead.
 
 > `app/opengraph-image.tsx` avoids the ₦ glyph — Satori has no font fallback for
 > U+20A6 and the build warns, then renders tofu. Use `NGN` in OG images.
