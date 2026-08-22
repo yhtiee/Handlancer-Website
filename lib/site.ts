@@ -7,12 +7,18 @@
  * away from what the product actually does.
  */
 
-/* The production origin is fixed to the www host and never derived from
-   VERCEL_URL: preview deployments would otherwise emit canonicals and OG URLs
-   pointing at a throwaway *.vercel.app origin. */
-const rawSiteUrl = 'https://www.handlancer.com/';
+/*
+ * The one place the site origin is configured. Metadata, canonicals, the
+ * sitemap, robots.txt and every JSON-LD @id derive from it.
+ *
+ * NEXT_PUBLIC_SITE_URL is inlined at build time. There is deliberately NO
+ * VERCEL_URL fallback: preview deployments would otherwise emit canonicals and
+ * OG URLs pointing at a throwaway *.vercel.app origin, which is how preview
+ * builds end up competing with production in the index.
+ */
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.handlancer.com';
 
-export const SITE_URL = rawSiteUrl.endsWith('/') ? rawSiteUrl.slice(0, -1) : rawSiteUrl;
+export const SITE_URL = rawSiteUrl.replace(/\/+$/, '');
 
 export const SITE = {
   name: 'HandLancer',
