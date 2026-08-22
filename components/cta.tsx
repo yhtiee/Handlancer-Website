@@ -1,8 +1,12 @@
-import { SITE, CATEGORIES, CITIES } from '@/lib/site';
+import Link from 'next/link';
+import { SITE, CATEGORIES } from '@/lib/site';
+import { CITY_PAGES, isIndexable } from '@/lib/cities';
 import { Reveal } from './reveal';
 import { LogoMark, IconArrowRight } from './icons';
 
 export function Cta() {
+  const launchCity = CITY_PAGES[0];
+
   return (
     <section id="download" className="scroll-mt-20 py-24 md:py-32">
       <div className="shell">
@@ -19,25 +23,43 @@ export function Cta() {
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
-              <a href="#waitlist" className="btn btn-primary">
+              <Link href="/#waitlist" className="btn btn-primary">
                 Join the waitlist
                 <IconArrowRight className="h-4 w-4" />
-              </a>
-              <a href="#escrow" className="btn btn-ghost">
+              </Link>
+              <Link href="/#escrow" className="btn btn-ghost">
                 How escrow works
-              </a>
+              </Link>
             </div>
           </div>
         </Reveal>
 
-        {/* Closing keyword line — genuine coverage detail, set as fine print. */}
+        {/* Closing line — real trades, linked, and honest about where we have
+            actually launched. It used to claim eight cities plus "every other
+            city in Nigeria" for a product that is live in none of them. */}
         <p className="mt-16 border-t border-[var(--rule)] pt-6 text-[13.5px] leading-relaxed text-[var(--muted)]">
-          Find and hire verified{' '}
-          {CATEGORIES.slice(0, 8)
-            .map((c) => c.label.toLowerCase())
-            .join(', ')}{' '}
-          professionals and more across {CITIES.slice(0, 8).join(', ')} and every other city in{' '}
-          {SITE.country}. Every job escrow-protected, every amount in naira.
+          Hire verified{' '}
+          {CATEGORIES.slice(0, 8).map((c, i, arr) => (
+            <span key={c.slug}>
+              <Link href={`/services/${c.slug}`} className="hover:text-[var(--navy)]">
+                {c.label.toLowerCase()}
+              </Link>
+              {i < arr.length - 1 ? ', ' : ''}
+            </span>
+          ))}{' '}
+          professionals and more.{' '}
+          {launchCity ? (
+            <>
+              We open city by city, starting with{' '}
+              <Link href={`/${launchCity.slug}`} className="hover:text-[var(--navy)]">
+                {launchCity.name}, {launchCity.state} State
+              </Link>
+              .
+            </>
+          ) : (
+            <>We open city by city.</>
+          )}{' '}
+          Every job escrow-protected, every amount in naira.
         </p>
       </div>
     </section>
@@ -47,33 +69,71 @@ export function Cta() {
 export function Footer() {
   const year = new Date().getFullYear();
 
+  /*
+   * Every href below resolves to a real, individually indexable page or to a
+   * rooted homepage anchor that works from any route.
+   *
+   * The old "Cities" column listed six cities that all pointed at `#services`.
+   * Links that pretend to be city pages are worse than no links: they promise a
+   * destination that does not exist. It is now cut down to the cities that have
+   * genuine local content — see lib/cities.ts for the gate that decides that.
+   */
+  const cityLinks: [string, string][] = CITY_PAGES.flatMap((city) => {
+    const trades = city.trades
+      .filter(isIndexable)
+      .map((t) => CATEGORIES.find((c) => c.slug === t.trade))
+      .filter((c): c is NonNullable<typeof c> => Boolean(c))
+      .slice(0, 5);
+
+    return [
+      [`${city.name} overview`, `/${city.slug}`] as [string, string],
+      ...trades.map(
+        (c) => [`${c.label} in ${city.name}`, `/${city.slug}/${c.slug}`] as [string, string],
+      ),
+    ];
+  });
+
   const COLUMNS = [
     {
       h: 'Product',
       links: [
-        ['Escrow', '#escrow'],
-        ['Services', '#services'],
-        ['How it works', '#how'],
-        ['Trust & safety', '#trust'],
-        ['For artisans', '#earn'],
-        ['FAQ', '#faq'],
+        ['Escrow', '/#escrow'],
+        ['Services', '/services'],
+        ['How it works', '/#how'],
+        ['Trust & safety', '/#trust'],
+        ['For artisans', '/for-artisans'],
+        ['Guides', '/guides'],
+        ['FAQ', '/#faq'],
       ] as [string, string][],
     },
     {
       h: 'Popular trades',
-      links: CATEGORIES.slice(0, 6).map((c) => [c.label, '#services'] as [string, string]),
+      links: CATEGORIES.slice(0, 6).map(
+        (c) => [c.label, `/services/${c.slug}`] as [string, string],
+      ),
     },
     {
-      h: 'Cities',
-      links: CITIES.slice(0, 6).map((c) => [c, '#services'] as [string, string]),
+      h: CITY_PAGES.length === 1 ? `In ${CITY_PAGES[0].name}` : 'Cities',
+      links: cityLinks,
+    },
+    {
+      h: 'Company',
+      links: [
+        ['About', '/about'],
+        ['Contact', '/contact'],
+        ['Privacy', '/privacy'],
+        ['Terms', '/terms'],
+      ] as [string, string][],
     },
   ];
 
   return (
     <footer className="band border-t border-[var(--rule)] py-14">
       <div className="shell">
-        <div className="grid gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
-          <div>
+        {/* Four link columns now, so the brand block gets its own row below md
+            rather than being squeezed. */}
+        <div className="grid gap-10 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-[1.4fr_1fr_1fr_1fr_1fr]">
+          <div className="sm:col-span-2 md:col-span-4 lg:col-span-1">
             <div className="flex items-center gap-2.5">
               <LogoMark className="h-8 w-8" />
               <span className="text-[18px] font-bold tracking-[-0.03em] text-[var(--navy)]">
@@ -98,16 +158,17 @@ export function Footer() {
                 {col.h}
               </p>
               <ul className="mt-4 space-y-2.5">
-                {col.links.map(([label, href]) => (
-                  <li key={label}>
-                    <a
-                      href={href}
-                      className="cursor-pointer text-[14px] text-[var(--muted)] transition-colors duration-200 hover:text-[var(--navy)]"
-                    >
-                      {label}
-                    </a>
-                  </li>
-                ))}
+                {col.links.map(([label, href]) => {
+                  const className =
+                    'cursor-pointer text-[14px] text-[var(--muted)] transition-colors duration-200 hover:text-[var(--navy)]';
+                  return (
+                    <li key={label}>
+                      <Link href={href} className={className}>
+                        {label}
+                      </Link>
+                    </li>
+                  );
+                })}
               </ul>
             </nav>
           ))}

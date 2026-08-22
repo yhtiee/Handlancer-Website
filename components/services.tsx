@@ -1,7 +1,17 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import { CATEGORIES, TRADES, CITIES } from '@/lib/site';
+import { CITY_PAGES } from '@/lib/cities';
 import { CATEGORY_ICONS, IconGrid } from './icons';
 import { Reveal } from './reveal';
+
+/** Cities we have actually launched — the ones with real local pages. */
+const LAUNCH_CITIES = CITY_PAGES;
+
+/** Everything else is a roadmap, and is labelled as one. */
+const NEXT_CITIES = CITIES.filter(
+  (c) => !LAUNCH_CITIES.some((launched) => launched.name === c),
+);
 
 export function Services() {
   return (
@@ -54,23 +64,46 @@ export function Services() {
           })}
         </div>
 
-        {/* Cities — plain typographic list, no pills */}
+        {/* Coverage — the launch city is called out separately from the roadmap.
+            This used to list all twelve cities flat under the heading
+            "Coverage", which read as a claim to be operating in twelve cities
+            while the product is live in none of them. */}
         <Reveal>
           <div className="mt-12 border-t border-[var(--rule)] pt-6">
             <p className="font-[family-name:var(--font-plex-mono)] text-[11px] uppercase tracking-[0.13em] text-[var(--muted)]">
-              Coverage
+              Launching first
             </p>
-            <p className="mt-3 max-w-[62ch] text-[19px] leading-relaxed text-[var(--ink)]">
-              {CITIES.map((c, n) => (
-                <span key={c}>
-                  <span className="font-semibold text-[var(--navy)]">{c}</span>
-                  {n < CITIES.length - 1 && <span className="text-[var(--rule-strong)]"> · </span>}
+            <p className="mt-3 text-[19px] leading-relaxed text-[var(--ink)]">
+              {LAUNCH_CITIES.map((city, n) => (
+                <span key={city.slug}>
+                  <Link
+                    href={`/${city.slug}`}
+                    className="font-semibold text-[var(--navy)] underline decoration-[var(--teal)] decoration-2 underline-offset-4"
+                  >
+                    {city.name}
+                  </Link>
+                  <span className="text-[var(--muted)]">, {city.state} State</span>
+                  {n < LAUNCH_CITIES.length - 1 && (
+                    <span className="text-[var(--rule-strong)]"> · </span>
+                  )}
                 </span>
               ))}
             </p>
-            <p className="mt-3 max-w-[52ch] text-[14.5px] text-[var(--muted)]">
-              Providers set their own service radius, so you only ever see artisans who actually
-              cover your street.
+
+            <p className="mt-6 font-[family-name:var(--font-plex-mono)] text-[11px] uppercase tracking-[0.13em] text-[var(--muted)]">
+              Next, as we open them
+            </p>
+            <p className="mt-3 max-w-[62ch] text-[16px] leading-relaxed text-[var(--muted)]">
+              {NEXT_CITIES.map((c, n) => (
+                <span key={c}>
+                  {c}
+                  {n < NEXT_CITIES.length - 1 && <span className="text-[var(--rule-strong)]"> · </span>}
+                </span>
+              ))}
+            </p>
+            <p className="mt-4 max-w-[54ch] text-[14.5px] text-[var(--muted)]">
+              We open city by city rather than claiming the whole country on day one. Providers set
+              their own service radius, so you only ever see artisans who actually cover your street.
             </p>
           </div>
         </Reveal>

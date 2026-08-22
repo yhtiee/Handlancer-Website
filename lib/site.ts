@@ -229,7 +229,7 @@ export const FAQS: Faq[] = [
   },
   {
     q: 'Which cities does HandLancer cover?',
-    a: `HandLancer is built for Nigeria and works anywhere you can reach an artisan, with the strongest coverage in ${CITIES.slice(0, 6).join(', ')} and other major cities. Providers set their own service radius, so you only see people who actually cover your area.`,
+    a: `We open city by city rather than claiming the whole country on day one. Uyo, Akwa Ibom State is our first launch city, and it is the only one with local pages today — real price ranges, the job types that town actually posts, and questions people there ask. ${CITIES.filter((c) => c !== 'Uyo').slice(0, 5).join(', ')} and other major cities follow as we open them. Providers set their own service radius, so you only see people who actually cover your area.`,
   },
   {
     q: 'Is HandLancer free to join as a service provider?',

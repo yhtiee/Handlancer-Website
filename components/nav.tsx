@@ -1,15 +1,28 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { LogoMark, IconMenu, IconClose } from './icons';
 
-const LINKS = [
-  { href: '#escrow', label: 'Escrow' },
-  { href: '#services', label: 'Services' },
-  { href: '#how', label: 'How it works' },
-  { href: '#trust', label: 'Trust' },
-  { href: '#earn', label: 'For artisans' },
+/*
+ * Every href is rooted. A bare `#escrow` is a dead link on /services/plumbing —
+ * it scrolls to nothing, because that section only exists on the homepage.
+ * `/#escrow` navigates home and then scrolls, from any route.
+ *
+ * All of them use next/link, including the hash ones: Link renders a real <a>
+ * and supports `/route#id`, so it handles cross-route fragments and prefetches
+ * the destination.
+ */
+const LINKS: { href: string; label: string }[] = [
+  { href: '/#escrow', label: 'Escrow' },
+  { href: '/services', label: 'Services' },
+  { href: '/#how', label: 'How it works' },
+  { href: '/#trust', label: 'Trust' },
+  { href: '/for-artisans', label: 'For artisans' },
+  { href: '/guides', label: 'Guides' },
 ];
+
+const FAQ_LINK = { href: '/#faq', label: 'FAQ' };
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -48,36 +61,36 @@ export function Nav() {
         style={{ borderBottom: `1px solid ${scrolled ? 'var(--rule)' : 'transparent'}` }}
       >
         <nav className="shell flex h-[70px] items-center justify-between gap-6" aria-label="Main">
-          <a href="#main" className="flex shrink-0 items-center gap-2.5" aria-label="HandLancer home">
+          <Link href="/" className="flex shrink-0 items-center gap-2.5" aria-label="HandLancer home">
             <LogoMark className="h-8 w-8" />
             <span className="text-[18px] font-bold tracking-[-0.03em] text-[var(--navy)]">
               HandLancer
             </span>
-          </a>
+          </Link>
 
           <ul className="hidden items-center gap-7 lg:flex">
             {LINKS.map((l) => (
               <li key={l.href}>
-                <a
+                <Link
                   href={l.href}
                   className="cursor-pointer text-[14.5px] font-medium text-[var(--muted)] transition-colors duration-200 hover:text-[var(--ink)]"
                 >
                   {l.label}
-                </a>
+                </Link>
               </li>
             ))}
           </ul>
 
           <div className="hidden shrink-0 items-center gap-5 md:flex">
-            <a
-              href="#faq"
+            <Link
+              href={FAQ_LINK.href}
               className="cursor-pointer text-[14.5px] font-medium text-[var(--muted)] transition-colors duration-200 hover:text-[var(--ink)]"
             >
-              FAQ
-            </a>
-            <a href="#waitlist" className="btn btn-primary !py-2.5 !text-[14.5px]">
+              {FAQ_LINK.label}
+            </Link>
+            <Link href="/#waitlist" className="btn btn-primary !py-2.5 !text-[14.5px]">
               Join the waitlist
-            </a>
+            </Link>
           </div>
 
           <button
@@ -95,22 +108,26 @@ export function Nav() {
 
       <div id="mobile-menu" hidden={!open} className="fixed inset-0 z-40 bg-[var(--paper)] pt-[70px] lg:hidden">
         <ul className="shell divide-y divide-[var(--rule)] border-t border-[var(--rule)]">
-          {LINKS.concat({ href: '#faq', label: 'FAQ' }).map((l) => (
+          {LINKS.concat(FAQ_LINK).map((l) => (
             <li key={l.href}>
-              <a
+              <Link
                 href={l.href}
                 onClick={() => setOpen(false)}
                 className="block cursor-pointer py-5 text-[22px] font-semibold tracking-[-0.02em] text-[var(--navy)]"
               >
                 {l.label}
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
         <div className="shell mt-8">
-          <a href="#waitlist" onClick={() => setOpen(false)} className="btn btn-primary w-full !py-4 !text-base">
+          <Link
+            href="/#waitlist"
+            onClick={() => setOpen(false)}
+            className="btn btn-primary w-full !py-4 !text-base"
+          >
             Join the waitlist
-          </a>
+          </Link>
         </div>
       </div>
     </>
