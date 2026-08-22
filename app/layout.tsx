@@ -68,6 +68,15 @@ export const metadata: Metadata = {
   authors: [{ name: SITE.name, url: SITE_URL }],
   creator: SITE.name,
   publisher: SITE.name,
+  /* Google Search Console ownership. The token is public by design — it only
+     proves control of this domain and grants nothing. Set here rather than in
+     lib/seo.ts so it lands in <head> on every route, not just the homepage:
+     Search Console re-checks it periodically and property-level checks can hit
+     any URL. `verification` is its own top-level key, so the shallow merge that
+     replaces `openGraph` per page does not affect it. */
+  verification: {
+    google: '54uz-0dEP-VSpwqXmVcaRygrtIM6g6ndYesery_WJig',
+  },
   openGraph: {
     type: 'website',
     locale: 'en_NG',
