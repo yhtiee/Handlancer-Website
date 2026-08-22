@@ -89,10 +89,14 @@ export function Footer() {
           </div>
 
           {COLUMNS.map((col) => (
+            /* A <p>, not a heading: these are 11px column labels, and the
+               surrounding <nav aria-label> already names the region. As <h2>
+               they injected four extra top-level headings into the outline of
+               every page. */
             <nav key={col.h} aria-label={col.h}>
-              <h2 className="font-[family-name:var(--font-plex-mono)] text-[11px] font-medium uppercase tracking-[0.13em] text-[var(--muted)]">
+              <p className="font-[family-name:var(--font-plex-mono)] text-[11px] font-medium uppercase tracking-[0.13em] text-[var(--muted)]">
                 {col.h}
-              </h2>
+              </p>
               <ul className="mt-4 space-y-2.5">
                 {col.links.map(([label, href]) => (
                   <li key={label}>

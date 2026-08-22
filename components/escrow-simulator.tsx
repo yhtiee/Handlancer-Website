@@ -91,15 +91,15 @@ function useCountUp(target: number, ms = 520) {
     const from = fromRef.current;
     if (from === target) return;
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      fromRef.current = target;
-      setValue(target);
-      return;
-    }
+    /* Reduced motion is a zero-duration run rather than a synchronous
+       setValue: the first frame lands on p = 1, so the figure still snaps,
+       but the effect body never calls setState directly (react-hooks/
+       set-state-in-effect). */
+    const duration = window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : ms;
 
     const t0 = performance.now();
     const tick = (now: number) => {
-      const p = Math.min((now - t0) / ms, 1);
+      const p = duration === 0 ? 1 : Math.min((now - t0) / duration, 1);
       setValue(Math.round(from + (target - from) * (1 - Math.pow(1 - p, 3))));
       if (p < 1) rafRef.current = requestAnimationFrame(tick);
       else fromRef.current = target;

@@ -7,13 +7,18 @@
  * away from what the product actually does.
  */
 
-// const rawSiteUrl =
-//   process.env.NEXT_PUBLIC_SITE_URL ||
-//   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'https://handlancer.vercel.app');
+/*
+ * The one place the site origin is configured. Metadata, canonicals, the
+ * sitemap, robots.txt and every JSON-LD @id derive from it.
+ *
+ * NEXT_PUBLIC_SITE_URL is inlined at build time. There is deliberately NO
+ * VERCEL_URL fallback: preview deployments would otherwise emit canonicals and
+ * OG URLs pointing at a throwaway *.vercel.app origin, which is how preview
+ * builds end up competing with production in the index.
+ */
+const rawSiteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.handlancer.com';
 
-const rawSiteUrl = 'https://www.handlancer.com/'
-
-export const SITE_URL = rawSiteUrl.endsWith('/') ? rawSiteUrl.slice(0, -1) : rawSiteUrl;
+export const SITE_URL = rawSiteUrl.replace(/\/+$/, '');
 
 export const SITE = {
   name: 'HandLancer',
@@ -36,86 +41,115 @@ export const SITE = {
 /* ------------------------------------------------------------------ */
 
 export type Category = {
+  /** Stable key, mirrors the app's category ids. Submitted by the waitlist form
+   *  and validated in lib/waitlist.ts — changing one breaks stored rows. */
   id: string;
+  /** URL segment for /services/[trade]. Kept separate from `id` so the app
+   *  parity key can stay short while the URL reads like English. */
+  slug: string;
   label: string;
-  /** Keyword-rich blurb; also feeds the ItemList structured data. */
+  /** One-line scope of the trade; also feeds the ItemList structured data. */
   blurb: string;
-  /** Long-tail search phrases this card is meant to rank for. */
-  searches: string[];
+  /** Conversational "why people actually call" line, shown on the card. */
+  demand: string;
 };
 
 export const CATEGORIES: Category[] = [
   {
     id: 'plumbing',
+    slug: 'plumbing',
     label: 'Plumbing',
     blurb: 'Burst pipes, leaking taps, water heaters, soakaway and borehole work.',
-    searches: ['plumber near me', 'emergency plumber Lagos', 'fix leaking pipe'],
+    demand:
+      'Most people post this one at the worst possible hour — a pipe that went overnight, or a tap that has been dripping since the last rainy season.',
   },
   {
     id: 'electrical',
+    slug: 'electrical',
     label: 'Electrical',
     blurb: 'Wiring, sockets, DB boards, inverter and solar installation.',
-    searches: ['electrician near me', 'house wiring Nigeria', 'inverter installation'],
+    demand:
+      'It usually starts with one socket that stopped working, and ends with somebody finally sizing the inverter properly.',
   },
   {
     id: 'carpentry',
+    slug: 'carpentry',
     label: 'Carpentry',
     blurb: 'Wardrobes, kitchen cabinets, doors, ceilings and custom furniture.',
-    searches: ['carpenter near me', 'kitchen cabinet maker', 'wardrobe installation'],
+    demand:
+      'New flat, empty rooms and a kitchen to fit out — or a wardrobe door that has been off its hinge long enough to count as furniture.',
   },
   {
     id: 'painting',
+    slug: 'painting',
     label: 'Painting',
     blurb: 'Interior and exterior painting, screeding, POP finishing and texture.',
-    searches: ['painter near me', 'house painting cost Nigeria', 'POP ceiling'],
+    demand:
+      'Landlords ask before a tenant moves in. Everyone else asks after the rains have finished with the outside wall.',
   },
   {
     id: 'cleaning',
+    slug: 'cleaning',
     label: 'Cleaning',
     blurb: 'Deep cleans, post-construction, fumigation and move-in cleaning.',
-    searches: ['cleaning service near me', 'post construction cleaning', 'fumigation service'],
+    demand:
+      'Builders leave dust in places you did not know existed, keys change hands tomorrow, and the fumigation has been put off twice already.',
   },
   {
     id: 'appliance',
+    slug: 'appliance-repair',
     label: 'Appliance Repair',
     blurb: 'Fridges, washing machines, microwaves, generators and gas cookers.',
-    searches: ['fridge repair near me', 'washing machine repair', 'generator repair'],
+    demand:
+      'A fridge that hums but never gets cold, a generator that will not start on the second pull, a washing machine stuck halfway through a cycle.',
   },
   {
     id: 'masonry',
+    slug: 'masonry',
     label: 'Masonry',
     blurb: 'Block work, plastering, tiling, interlocking and concrete repairs.',
-    searches: ['bricklayer near me', 'tiler Nigeria', 'interlocking installation'],
+    demand:
+      'Tiling a bathroom properly, laying interlocking across the compound, or patching the plaster where damp has been getting in.',
   },
   {
     id: 'ac',
+    slug: 'air-conditioning',
     label: 'AC & Cooling',
     blurb: 'Air conditioner installation, gassing, servicing and chiller repair.',
-    searches: ['AC repair near me', 'air conditioner installation Lagos', 'AC gassing'],
+    demand:
+      'It is always the first genuinely hot week of the year, and always the unit nobody serviced at the end of the last one.',
   },
   {
     id: 'auto',
+    slug: 'auto-repair',
     label: 'Auto Repair',
     blurb: 'Mobile mechanics, diagnostics, panel beating and AC servicing.',
-    searches: ['mobile mechanic near me', 'car diagnostics Nigeria', 'panel beater'],
+    demand:
+      'A warning light nobody can explain, a car that will not start where it is parked, or a wing to beat out after somebody reversed into it.',
   },
   {
     id: 'gardening',
+    slug: 'gardening',
     label: 'Gardening',
     blurb: 'Landscaping, lawn care, tree cutting and garden maintenance.',
-    searches: ['gardener near me', 'landscaping Nigeria', 'lawn mowing service'],
+    demand:
+      'Lawns that got away during the rains, a tree leaning nearer the roof than it used to, or a bare compound being laid out from scratch.',
   },
   {
     id: 'moving',
+    slug: 'moving',
     label: 'Moving & Haulage',
     blurb: 'House moves, office relocation, pickup trucks and dispatch.',
-    searches: ['movers near me', 'house moving service Lagos', 'haulage truck hire'],
+    demand:
+      'A flat to empty before the weekend, an office to shift over a public holiday, or one heavy thing that was never going to fit in a car.',
   },
   {
     id: 'other',
+    slug: 'handyman',
     label: 'More Trades',
     blurb: 'Welders, tailors, barbers, chefs, drivers and general handymen.',
-    searches: ['welder near me', 'tailor near me', 'handyman Nigeria'],
+    demand:
+      'Gates and burglary bars, a suit that needs taking in, a driver for the week, and the small repairs nobody has a proper name for.',
   },
 ];
 
