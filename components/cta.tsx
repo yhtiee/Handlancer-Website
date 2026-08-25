@@ -1,8 +1,8 @@
 import Link from 'next/link';
-import { SITE, CATEGORIES } from '@/lib/site';
+import { SITE, SOCIALS, CATEGORIES } from '@/lib/site';
 import { CITY_PAGES, isIndexable } from '@/lib/cities';
 import { Reveal } from './reveal';
-import { LogoMark, IconArrowRight } from './icons';
+import { LogoMark, IconArrowRight, SOCIAL_ICONS } from './icons';
 
 export function Cta() {
   const launchCity = CITY_PAGES[0];
@@ -146,6 +146,30 @@ export function Footer() {
             <a href={`mailto:${SITE.email}`} className="ulink mt-4 inline-block text-[14px]">
               {SITE.email}
             </a>
+
+            {/* Same list the Organization `sameAs` is built from — see
+                lib/site.ts. Plain <a>, not next/link: these leave the app, so
+                there is nothing for the router to prefetch. */}
+            {SOCIALS.length > 0 && (
+              <ul aria-label="HandLancer on social media" className="mt-5 flex items-center gap-3">
+                {SOCIALS.map((s) => {
+                  const Icon = SOCIAL_ICONS[s.icon];
+                  return (
+                    <li key={s.url}>
+                      <a
+                        href={s.url}
+                        target="_blank"
+                        rel="me noopener noreferrer"
+                        aria-label={`${SITE.name} on ${s.label}`}
+                        className="flex h-9 w-9 items-center justify-center rounded-full border border-[var(--rule)] text-[var(--muted)] transition-colors duration-200 hover:border-[var(--navy)] hover:text-[var(--navy)]"
+                      >
+                        <Icon className="h-[17px] w-[17px]" />
+                      </a>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
 
           {COLUMNS.map((col) => (

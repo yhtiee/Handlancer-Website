@@ -37,6 +37,40 @@ export const SITE = {
 } as const;
 
 /* ------------------------------------------------------------------ */
+/* Social profiles                                                     */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Live public profiles, in the order the footer renders them.
+ *
+ * One list, two consumers: the footer icon row and the Organization `sameAs`
+ * in lib/schema.ts. Keeping them on the same source is the point — `sameAs`
+ * that lists a profile the site never links to is a claim Google cannot
+ * corroborate, and a footer link missing from `sameAs` is a wasted signal.
+ *
+ * `icon` keys into SOCIAL_ICONS in components/icons.tsx. Only add an entry
+ * once the account genuinely exists and is public.
+ */
+export type Social = {
+  /** Accessible name — read out as "HandLancer on TikTok". */
+  label: string;
+  /** Canonical profile URL, absolute, no tracking parameters. */
+  url: string;
+  /** Key into SOCIAL_ICONS. */
+  icon: 'tiktok' | 'x' | 'instagram' | 'facebook';
+};
+
+export const SOCIALS: Social[] = [
+  { label: 'TikTok', url: 'https://www.tiktok.com/@handlancer', icon: 'tiktok' },
+  { label: 'X', url: 'https://x.com/HandLancer', icon: 'x' },
+  { label: 'Instagram', url: 'https://www.instagram.com/handlancer/', icon: 'instagram' },
+  /* A /share/ shortlink, which redirects to the real Page URL rather than being
+     it. Fine as a footer link; weaker as a `sameAs` claim, since that wants the
+     canonical profile URL. Swap in https://www.facebook.com/<page> once known. */
+  { label: 'Facebook', url: 'https://www.facebook.com/share/19RTB8Vxcy/', icon: 'facebook' },
+];
+
+/* ------------------------------------------------------------------ */
 /* Service categories — mirrors src/constants/categories.ts in the app */
 /* ------------------------------------------------------------------ */
 

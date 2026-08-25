@@ -133,6 +133,43 @@ export const IconDoc = (p: P) => (
   <Svg {...p}><path d="M14 3.5H7a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8.5L14 3.5Z" /><path d="M13.5 3.5V9h5.5" /><path d="M8.5 13h7M8.5 16.5h4.5" /></Svg>
 );
 
+/* -- social glyphs -------------------------------------------------------- */
+
+/**
+ * Brand marks are filled glyphs, not the 1.7px stroke the icon set above uses —
+ * a stroked outline of a wordmark stops being the wordmark. Same 24 grid and
+ * currentColor, so they still inherit the footer's muted → navy hover.
+ */
+function BrandSvg({ children, ...p }: P & { children: React.ReactNode }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false" {...p}>
+      {children}
+    </svg>
+  );
+}
+
+export const IconTikTok = (p: P) => (
+  <BrandSvg {...p}><path d="M16.6 5.82A4.28 4.28 0 0 1 15.54 3h-3.09v12.4a2.59 2.59 0 0 1-2.59 2.5 2.59 2.59 0 0 1 0-5.18c.27 0 .52.04.76.12v-3.2a5.9 5.9 0 0 0-.76-.05 5.7 5.7 0 1 0 5.7 5.7V9.01a7.35 7.35 0 0 0 4.3 1.38V7.3a4.3 4.3 0 0 1-3.26-1.48Z" /></BrandSvg>
+);
+export const IconX = (p: P) => (
+  <BrandSvg {...p}><path d="M18.24 2.25h3.31l-7.23 8.26 8.5 11.24h-6.66l-5.21-6.82-5.97 6.82H1.67l7.73-8.84L1.25 2.25h6.83l4.71 6.23 5.45-6.23Zm-1.16 17.52h1.83L7.08 4.13H5.12l11.96 15.64Z" /></BrandSvg>
+);
+export const IconInstagram = (p: P) => (
+  <BrandSvg {...p}><path d="M12 2.16c3.2 0 3.58.01 4.85.07 3.25.15 4.77 1.69 4.92 4.92.06 1.27.07 1.64.07 4.85 0 3.2-.01 3.58-.07 4.85-.15 3.23-1.66 4.77-4.92 4.92-1.27.06-1.64.07-4.85.07-3.2 0-3.58-.01-4.85-.07-3.26-.15-4.77-1.7-4.92-4.92-.06-1.27-.07-1.64-.07-4.85 0-3.2.01-3.58.07-4.85.15-3.23 1.66-4.77 4.92-4.92 1.27-.06 1.65-.07 4.85-.07ZM12 0C8.74 0 8.33.01 7.05.07 2.7.27.27 2.69.07 7.05.01 8.33 0 8.74 0 12c0 3.26.01 3.67.07 4.95.2 4.36 2.62 6.78 6.98 6.98C8.33 23.99 8.74 24 12 24c3.26 0 3.67-.01 4.95-.07 4.35-.2 6.78-2.62 6.98-6.98.06-1.28.07-1.69.07-4.95 0-3.26-.01-3.67-.07-4.95-.2-4.35-2.62-6.78-6.98-6.98C15.67.01 15.26 0 12 0Zm0 5.84a6.16 6.16 0 1 0 0 12.32 6.16 6.16 0 0 0 0-12.32ZM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm6.41-11.85a1.44 1.44 0 1 0 0 2.88 1.44 1.44 0 0 0 0-2.88Z" /></BrandSvg>
+);
+
+export const IconFacebook = (p: P) => (
+  <BrandSvg {...p}><path d="M9.1 23.69v-7.98H6.63v-3.67H9.1v-1.58c0-4.08 1.85-5.98 5.86-5.98.4 0 .96.04 1.47.1.51.07.94.16 1.14.2v3.32a8.6 8.6 0 0 0-.65-.03c-.25-.01-.5-.01-.74-.01-.7 0-1.25.1-1.67.31a1.7 1.7 0 0 0-.68.62c-.26.42-.37 1-.37 1.75v1.3h3.92l-.39 2.1-.29 1.57h-3.24v8.24C19.4 23.24 24 18.18 24 12.04 24 5.42 18.63.04 12 .04S0 5.42 0 12.04c0 5.63 3.87 10.35 9.1 11.65Z" /></BrandSvg>
+);
+
+/** Social `icon` key (lib/site.ts) → glyph. */
+export const SOCIAL_ICONS: Record<string, (p: P) => React.ReactElement> = {
+  tiktok: IconTikTok,
+  x: IconX,
+  instagram: IconInstagram,
+  facebook: IconFacebook,
+};
+
 /** The app's logo mark, redrawn as inline SVG so the nav has no image request. */
 export function LogoMark({ className }: { className?: string }) {
   return (

@@ -14,7 +14,7 @@
  * is described once and pointed at from everywhere else.
  */
 
-import { SITE, SITE_URL, CATEGORIES, type Category, type Faq } from '@/lib/site';
+import { SITE, SITE_URL, SOCIALS, CATEGORIES, type Category, type Faq } from '@/lib/site';
 import { canonicalUrl } from '@/lib/seo';
 
 /* ------------------------------------------------------------------ */
@@ -42,16 +42,13 @@ export const WEBSITE_ID = `${SITE_URL}/#website`;
 /**
  * Public profiles for the Organization's `sameAs`.
  *
- * FILL THIS IN as the accounts go live — `sameAs` is how Google reconciles the
- * site with a real entity. Left empty the property is omitted entirely rather
- * than emitted as `[]`, because an empty array is a claim of "no profiles".
+ * Derived from SOCIALS in lib/site.ts, which is also what the footer renders —
+ * so every profile claimed here is one a crawler can find linked on the page,
+ * which is the whole basis on which `sameAs` gets believed. Add accounts there,
+ * not here. Left empty the property is omitted entirely rather than emitted as
+ * `[]`, because an empty array is a claim of "no profiles".
  */
-export const SOCIAL_PROFILES: readonly string[] = [
-  // 'https://www.instagram.com/handlancer',
-  // 'https://x.com/handlancer',
-  // 'https://www.facebook.com/handlancer',
-  // 'https://www.linkedin.com/company/handlancer',
-];
+export const SOCIAL_PROFILES: readonly string[] = SOCIALS.map((s) => s.url);
 
 /* ------------------------------------------------------------------ */
 /* Site-wide nodes                                                     */
