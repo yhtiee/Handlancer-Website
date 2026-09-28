@@ -151,3 +151,126 @@ No animation library. Scroll reveals use one `IntersectionObserver` per element
 (`components/reveal.tsx`) that disconnects after firing; everything else is CSS
 keyframes. `prefers-reduced-motion` is honoured globally in `globals.css`, and
 the escrow count-up snaps instead of animating.
+
+## Admin console (`/admin`)
+
+The operations dashboard for the mobile app lives in this repo under `/admin`.
+It shares the site's tokens and fonts, and the marketing pages never load its
+code, CSS or proxy.
+
+**Setup**
+
+1. `.env`: `SUPABASE_URL` / `SUPABASE_ANON_KEY` for the **mobile app's** project,
+   plus `SUPABASE_SERVICE_ROLE_KEY` (see `.env.example`). All server-only.
+2. Run `supabase/admin_users.sql` once (already applied to *HandLancer Application*).
+3. Add an admin: create the user under Supabase → Authentication, then insert
+   their id into `admin_users` (the snippet is at the bottom of the SQL file).
+
+**How access works**
+
+- `proxy.ts` runs on `/admin/*` only. It refreshes the Supabase session cookie
+  and bounces signed-out visitors to `/admin/login`. It is an optimisation, not
+  the gate.
+- `lib/admin/auth.ts` `requireAdmin()` is the gate. It validates the session
+  with the Auth server, then checks `admin_users`. Every data function and
+  Server Action calls it.
+- Data is read with the service-role client (`lib/admin/supabase.ts`,
+  `server-only`), because the dispute settlement RPCs from mobile migration 0009
+  are granted to `service_role` only.
+
+**Where things live**
+
+| Path | What |
+| --- | --- |
+| `app/admin/login/` | Sign-in |
+| `app/admin/(console)/*/page.tsx` | Server: prefetches the page's query into a `HydrationBoundary` |
+| `app/admin/(console)/*/view.tsx` | Client: renders from `useQuery` |
+| `app/admin/api/` | JSON route handlers the client queries hit, wrapped by `lib/admin/api.ts` |
+| `app/admin/actions.ts` | Server Actions used as `mutationFn`s: sign in/out, settle a dispute |
+| `app/admin/admin.css` | Console styles, scoped under `.admin` |
+| `components/admin/` | Shell, list view and controls, table, stat tiles, badges, brand logo |
+| `lib/admin/data/` | One module per section; every query starts with `requireAdmin()` |
+| `lib/admin/query/` | TanStack: keys + URL filter parsing, client factory, fetcher, hooks |
+| `lib/admin/types.ts` | Row types, mirrored from the mobile repo's migrations |
+
+**Data flow (TanStack Query).** All reads and writes go through TanStack Query:
+
+- **Reads.** A page starts its query on the server but does **not** await it.
+  The pending query streams to the browser inside a `HydrationBoundary`, so
+  navigating never waits on the database. The view reads it with a hook from
+  `lib/admin/query/hooks.ts`, which fetches `/admin/api/*` from then on: refetch
+  on focus, cached Back and Forward, previous rows kept on screen while a filter
+  loads.
+- **Caching.** A page you have visited renders from the TanStack cache on the
+  first frame and refreshes in the background (`gcTime` 30 min). Next reuses the
+  page payload for 30s (`staleTimes.dynamic` in `next.config.ts`), so a quick
+  revisit makes no server request at all. There is deliberately no route-level
+  `loading.tsx`; the clicked sidebar item pulses instead. Hovering a sidebar item
+  or a table row starts its fetch early, so first visits are faster too.
+- **Hydration.** Query hooks hold data back during the server render and
+  hydration pass (`useAdminQuery`), because streamed data often arrives before
+  hydration and would otherwise mismatch the server's skeleton. Do not call
+  `useQuery` directly in a view.
+- **Filters and paging** live in the URL but change through `history.pushState`.
+  A tab click fetches just the JSON, with no server re-render.
+- **Writes.** `useSignIn`, `useSignOut` and `useResolveDispute` wrap the Server
+  Actions. A settlement invalidates everything under `['admin']`.
+- **Session.** A 401 from any query clears the cache and sends the admin to
+  sign-in, returning them to the same page afterwards.
+
+**Analytics (`/admin/analytics`).** Performance over any period, compared with
+the one before, in Lagos time.
+
+- **Controls:** range presets (7D, 30D, 90D, 12M, YTD, custom) and an interval
+  (daily, weekly, monthly), all in the URL, so a link reopens the same view.
+- **Headline numbers:** escrow funded, paid to providers, jobs posted and
+  completed, hire rate, new sign-ups, dispute rate, and median time to hire.
+  Each shows its change from the previous period and a written definition.
+- **Sections:** money through escrow, jobs, hire funnel, sign-ups, demand by
+  trade, locations, wallet flows, disputes, and top providers. An in-progress
+  final period is drawn dashed or lighter and labelled "(to date)".
+- **Exports:**
+  - PowerPoint: native, editable charts, speaker notes, and a definitions slide.
+  - Excel: a summary sheet plus one sheet per section, with number formats.
+  - PDF: the print stylesheet, laid out for A4 landscape.
+  - Per chart: CSV and PNG.
+
+  The export libraries load only when clicked.
+- **Present:** full screen, one section per slide, arrow keys to move.
+
+Where it lives:
+
+| Path | What |
+| --- | --- |
+| `lib/admin/analytics/range.ts` | Presets, Lagos-time buckets, previous period (tested in `range.test.ts`) |
+| `lib/admin/data/analytics.ts` | Server aggregation from the ledger. Money comes from `transactions`, not job budgets |
+| `lib/admin/analytics/sections.ts` | The single definition of every section, used by the page, the slides and all exports |
+| `lib/admin/analytics/export.ts` | CSV, PNG, Excel, PowerPoint, PDF |
+| `components/admin/charts/` | SVG charts, following the palette validated by the dataviz skill |
+
+Aggregation runs in Node, with a 50,000-row cap per table; the page warns if a
+range hits it. At that volume, move the sums into a SQL function and keep the
+report shape. To add a chart, add a section in `sections.ts` and every surface
+picks it up.
+
+**Adding a section:** add `lib/admin/data/<thing>.ts`, a key in
+`lib/admin/query/keys.ts`, a route in `app/admin/api/<thing>/route.ts`, a hook
+in `hooks.ts`, then `app/admin/(console)/<thing>/page.tsx` + `view.tsx`, and
+list it in `NAV` in `components/admin/shell.tsx`.
+
+**Styling:** the console uses the marketing site's system (DESIGN-SYSTEM.md),
+not a new one:
+
+- **Colour:** the site's tokens only. Navy for headings and structure, ink for
+  body text, muted for secondary text, and teal as a fill (buttons, bars, the
+  current row on `--teal-wash`), never as text. `--bad` is only for errors
+  and states that need a person.
+- **Type:** Spline Sans for UI and headings, including the `<em>` Newsreader
+  accent. `.lede` for page intros. Plex Mono (`.figure`) for every naira
+  amount, count and date column, and `.label` (the `.marker` type) for panel
+  titles, table headers and field labels.
+- **Shape:** square bordered panels, the services-grid "ruled grid" for tiles,
+  the site's own `.btn` and `.ulink`, 6px inputs, teal-underline tabs. No
+  shadows, no blur.
+- **Logo:** the real brand mark (`public/brand/logo.png`, trimmed to
+  `logo-mark.webp`) via `components/admin/brand-logo.tsx`, with the wordmark.

@@ -12,7 +12,8 @@ export default function robots(): MetadataRoute.Robots {
         userAgent: '*',
         allow: '/',
         // Server actions and any future route handlers have nothing to crawl.
-        disallow: '/api/',
+        // /admin is the operations console; its pages also send noindex.
+        disallow: ['/api/', '/admin'],
       },
     ],
     sitemap: `${SITE_URL}/sitemap.xml`,
