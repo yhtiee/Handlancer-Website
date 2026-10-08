@@ -123,6 +123,7 @@ export function Footer() {
         ['Contact', '/contact'],
         ['Privacy', '/privacy'],
         ['Terms', '/terms'],
+        ['Delete account', '/delete-account'],
       ] as [string, string][],
     },
   ];

@@ -3,12 +3,18 @@ import { Reveal } from './reveal';
 
 export type LegalSection = {
   heading: string;
+  /** Anchor for deep links — the store listing and the app link to these. */
+  id?: string;
   paragraphs: ReactNode[];
   list?: ReactNode[];
+  /** Render the list as numbered steps rather than a plain list. */
+  ordered?: boolean;
+  /** Shown after the list, for anything that has to follow it. */
+  after?: ReactNode[];
 };
 
 /**
- * Body renderer shared by /privacy and /terms.
+ * Body renderer shared by /privacy, /terms and /delete-account.
  *
  * Numbered sections in the same mono-figure idiom as the escrow steps and the
  * FAQ index, so the legal pages read as part of the same document set rather
@@ -50,40 +56,59 @@ export function LegalBody({
         )}
 
         <ol className="mt-12 divide-y divide-[var(--rule)] border-y border-[var(--rule)]">
-          {sections.map((s, i) => (
-            <Reveal as="li" key={s.heading} delay={Math.min(i, 3) * 60}>
-              <div className="grid gap-4 py-8 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] md:gap-10">
-                <h2 className="flex items-baseline gap-3.5 text-[18px] font-bold leading-snug tracking-[-0.02em] text-[var(--navy)]">
-                  <span className="figure shrink-0 text-[12px] text-[var(--muted)]">
-                    {String(i + 1).padStart(2, '0')}
-                  </span>
-                  {s.heading}
-                </h2>
-                <div>
-                  {s.paragraphs.map((p, n) => (
-                    <p
-                      key={n}
-                      className={`max-w-[64ch] text-[15px] leading-relaxed text-[var(--muted)] ${n > 0 ? 'mt-4' : ''}`}
-                    >
-                      {p}
-                    </p>
-                  ))}
-                  {s.list && (
-                    <ul className="mt-5 max-w-[64ch] divide-y divide-[var(--rule)] border-y border-[var(--rule)]">
-                      {s.list.map((item, n) => (
-                        <li
-                          key={n}
-                          className="py-3 text-[14.5px] leading-relaxed text-[var(--muted)]"
-                        >
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
-                  )}
+          {sections.map((s, i) => {
+            const ListTag = s.ordered ? 'ol' : 'ul';
+            return (
+              <Reveal as="li" key={s.heading} delay={Math.min(i, 3) * 60}>
+                <div
+                  id={s.id}
+                  className="grid scroll-mt-24 gap-4 py-8 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] md:gap-10"
+                >
+                  <h2 className="flex items-baseline gap-3.5 text-[18px] font-bold leading-snug tracking-[-0.02em] text-[var(--navy)]">
+                    <span className="figure shrink-0 text-[12px] text-[var(--muted)]">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    {s.heading}
+                  </h2>
+                  <div>
+                    {s.paragraphs.map((p, n) => (
+                      <p
+                        key={n}
+                        className={`max-w-[64ch] text-[15px] leading-relaxed text-[var(--muted)] ${n > 0 ? 'mt-4' : ''}`}
+                      >
+                        {p}
+                      </p>
+                    ))}
+                    {s.list && (
+                      <ListTag className="mt-5 max-w-[64ch] divide-y divide-[var(--rule)] border-y border-[var(--rule)]">
+                        {s.list.map((item, n) => (
+                          <li
+                            key={n}
+                            className="flex gap-3.5 py-3 text-[14.5px] leading-relaxed text-[var(--muted)]"
+                          >
+                            {s.ordered && (
+                              <span className="figure shrink-0 pt-[3px] text-[12px] text-[var(--navy)]">
+                                {String(n + 1).padStart(2, '0')}
+                              </span>
+                            )}
+                            <span>{item}</span>
+                          </li>
+                        ))}
+                      </ListTag>
+                    )}
+                    {s.after?.map((p, n) => (
+                      <p
+                        key={n}
+                        className="mt-4 max-w-[64ch] text-[15px] leading-relaxed text-[var(--muted)]"
+                      >
+                        {p}
+                      </p>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            </Reveal>
-          ))}
+              </Reveal>
+            );
+          })}
         </ol>
       </div>
     </section>

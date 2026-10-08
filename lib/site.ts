@@ -28,7 +28,21 @@ export const SITE = {
     'HandLancer is Nigeria’s escrow-protected marketplace for home services. Post a job, compare quotes from verified plumbers, electricians, carpenters and cleaners near you, and keep your money in escrow until the work is done right.',
   shortDescription:
     'Escrow-protected marketplace for hiring verified artisans in Nigeria.',
-  email: 'handlancerng@gmail.com',
+  email: 'hello@handlancer.com',
+  /* Where account, privacy and payment requests go. Mirrors SUPPORT_EMAIL and
+     SUPPORT_WHATSAPP_* in the app's src/constants/support.ts — the legal pages
+     promise a reply through these, so they must match what the app shows. */
+  support: {
+    email: 'support@handlancer.com',
+    whatsappDisplay: '0912 733 6503',
+    whatsappUrl: 'https://wa.me/2349127336503',
+  },
+  /* The app exactly as the store listing names it. Google Play requires the
+     account-deletion page to reference the app by its listed name. */
+  app: {
+    name: 'Handlancer',
+    androidPackage: 'com.yhutiee.handlancer',
+  },
   country: 'Nigeria',
   currency: 'NGN',
   /* Pre-launch: every CTA points at #waitlist rather than a store listing.
