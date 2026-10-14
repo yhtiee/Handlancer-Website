@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en-NG">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#FBFCFD">
+<title>Offline · HandLancer</title>
+<style>
+  /* Served by public/sw.js when a page has never been loaded and there is no
+     connection. Self-contained: no fonts, no scripts, the site's tokens. */
+  :root { --ink:#10151b; --paper:#fbfcfd; --muted:#5b6772; --navy:#1e3a5f; --teal:#0fb5a4; --rule:#e5e9ec; }
+  * { box-sizing: border-box; }
+  body { margin:0; min-height:100dvh; display:grid; place-items:center; padding:24px;
+         background:var(--paper); color:var(--ink);
+         font:16px/1.55 ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width:420px; text-align:center; }
+  img { width:64px; height:auto; }
+  h1 { margin:20px 0 8px; color:var(--navy); font-size:26px; letter-spacing:-0.03em; line-height:1.15; }
+  p { margin:0; color:var(--muted); }
+  button { margin-top:24px; height:44px; padding:0 22px; border:0; border-radius:6px;
+           background:var(--teal); color:#06201d; font:600 15px/1 inherit; cursor:pointer; }
+</style>
+</head>
+<body>
+<main>
+  <img src="/brand/logo-mark.webp" alt="">
+  <h1>You’re offline</h1>
+  <p>HandLancer needs a connection to load this page. Your jobs and money are safe in escrow — nothing moves until you’re back.</p>
+  <button type="button" onclick="location.reload()">Try again</button>
+</main>
+</body>
+</html>

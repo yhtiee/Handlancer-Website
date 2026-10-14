@@ -17,18 +17,18 @@ export function Cta() {
                 Your next repair deserves a receipt, not <em>a leap of faith</em>
               </h2>
               <p className="lede mt-6 max-w-[44ch]">
-                We are still building. Put your name down and you will be among the first in when
-                HandLancer opens in your city.
+                Artisans can join today and get reviewed before customers arrive. Customers, put
+                your name down and you will be among the first in when your city opens.
               </p>
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
-              <Link href="/#waitlist" className="btn btn-primary">
-                Join the waitlist
+              <Link href="/for-artisans" className="btn btn-primary">
+                Join as an artisan
                 <IconArrowRight className="h-4 w-4" />
               </Link>
-              <Link href="/#escrow" className="btn btn-ghost">
-                How escrow works
+              <Link href="/#waitlist" className="btn btn-ghost">
+                Customer waitlist
               </Link>
             </div>
           </div>

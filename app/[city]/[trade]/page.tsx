@@ -322,7 +322,9 @@ export default async function CityTradePage({
         <CtaCompact
           heading={`Need a ${category.label.toLowerCase()} job done in ${city.name}?`}
           emphasis="Get in first."
-          lede={`${city.name} is our first launch city. Join the waitlist and you will be among the first to post a job when we open.`}
+          lede={`${city.name} is our first launch city. Join the waitlist and you will be among the first to post a job when we open to customers.`}
+          secondaryHref="/for-artisans"
+          secondaryLabel={`A ${category.label.toLowerCase()} pro? Join`}
         />
       </main>
       <Footer />

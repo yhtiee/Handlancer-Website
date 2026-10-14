@@ -9,6 +9,7 @@ import {
   IconChart,
   IconClipboard,
   IconClose,
+  IconIdBadge,
   IconLogout,
   IconMenu,
   IconOverview,
@@ -16,6 +17,7 @@ import {
   IconUsers,
   IconWallet,
 } from '@/components/admin/icons';
+import { AdminBell, AdminTopBar } from '@/components/admin/admin-topbar';
 import { BrandLogo } from '@/components/admin/brand-logo';
 import { useBadges, usePrefetchSection, useSignOut } from '@/lib/admin/query/hooks';
 
@@ -23,7 +25,7 @@ type NavItem = {
   href: string;
   label: string;
   icon: ComponentType<SVGProps<SVGSVGElement>>;
-  badgeKey?: 'openDisputes';
+  badgeKey?: 'openDisputes' | 'pendingArtisans';
 };
 
 /** The console's sections. Add a page under app/admin/(console)/ and list it here. */
@@ -31,6 +33,7 @@ const NAV: NavItem[] = [
   { href: '/admin', label: 'Overview', icon: IconOverview },
   { href: '/admin/analytics', label: 'Analytics', icon: IconChart },
   { href: '/admin/disputes', label: 'Disputes', icon: IconShield, badgeKey: 'openDisputes' },
+  { href: '/admin/artisans', label: 'Artisans', icon: IconIdBadge, badgeKey: 'pendingArtisans' },
   { href: '/admin/jobs', label: 'Jobs', icon: IconBriefcase },
   { href: '/admin/users', label: 'Users', icon: IconUsers },
   { href: '/admin/transactions', label: 'Transactions', icon: IconWallet },
@@ -80,6 +83,9 @@ export function AdminShell({ admin, children }: Props) {
           <IconMenu width={22} height={22} />
         </button>
         <Brand />
+        <div className="ml-auto">
+          <AdminBell />
+        </div>
       </header>
 
       {/* Mobile drawer */}
@@ -110,6 +116,7 @@ export function AdminShell({ admin, children }: Props) {
       </div>
 
       <main className="lg:pl-[var(--sidebar-w)] print:!pl-0">
+        <AdminTopBar email={admin.email} />
         <div className="mx-auto w-full max-w-[1280px] px-4 py-6 md:px-8 md:py-10 print:max-w-none print:p-0">{children}</div>
       </main>
     </div>
@@ -182,7 +189,7 @@ function SidebarContent({ admin, onNavigate }: Omit<Props, 'children'> & { onNav
                   {badge > 0 && (
                     <span
                       className="figure min-w-6 rounded-full bg-[var(--navy)] px-1.5 text-center text-[11.5px] font-semibold leading-5 text-white"
-                      aria-label={`${badge} open`}
+                      aria-label={badgeKey === 'pendingArtisans' ? `${badge} to review` : `${badge} open`}
                     >
                       {badge}
                     </span>

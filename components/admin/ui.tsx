@@ -4,7 +4,7 @@
  *
  * Built from the marketing site's idioms (DESIGN-SYSTEM.md): bordered square
  * panels, .marker-style mono labels, .lede for page intros, .figure for every
- * naira amount and metric. Colour: navy + teal on greys (app/admin/admin.css).
+ * naira amount and metric. Colour: navy + teal on greys (app/dashboard.css).
  */
 import Link from 'next/link';
 
@@ -33,7 +33,8 @@ export function PageHeader({
       {back && (
         <Link
           href={back.href}
-          className="label mb-4 inline-flex items-center gap-1 transition-colors duration-200 hover:!text-[var(--ink)]"
+          // Desktop has breadcrumbs in the top bar; this is the phone's way back.
+          className="label mb-4 inline-flex items-center gap-1 transition-colors duration-200 hover:!text-[var(--ink)] lg:hidden print:hidden"
         >
           <IconChevronLeft width={14} height={14} />
           {back.label}
@@ -164,6 +165,8 @@ const TONES: Record<string, Tone> = {
   funded: 'active',
   materials_released: 'active',
   refunded: 'neutral',
+  // artisan review (supabase/artisan_review.sql)
+  suspended: 'alert',
   // people
   user: 'neutral',
   provider: 'progress',

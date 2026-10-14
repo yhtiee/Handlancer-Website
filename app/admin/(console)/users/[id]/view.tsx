@@ -31,6 +31,11 @@ export function UserView({ id }: { id: string }) {
           <>
             <StatusBadge status={p.role} label={isProvider ? 'Provider' : 'Client'} />
             {p.is_verified && <StatusBadge status="success" label="Verified" />}
+            {isProvider && (
+              <a href={`/admin/artisans/${p.id}`} className="ulink">
+                Artisan application
+              </a>
+            )}
             <span>Joined {formatDate(p.created_at)}</span>
           </>
         }
@@ -100,7 +105,7 @@ export function UserView({ id }: { id: string }) {
           </Section>
         </div>
 
-        <aside className="space-y-4 md:space-y-6 lg:sticky lg:top-10 lg:self-start">
+        <aside className="space-y-4 md:space-y-6 lg:sticky lg:top-24 lg:self-start">
           <Section title="Wallet">
             <p className="label !text-[10.5px]">Balance</p>
             <p className="figure mt-2 text-[30px] font-medium leading-none text-[var(--navy)]">

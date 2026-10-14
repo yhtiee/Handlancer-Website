@@ -77,6 +77,11 @@ export const adminKeys = {
     list: (f: ListFilters) => [...all, 'jobs', 'list', f] as const,
     detail: (id: string) => [...all, 'jobs', 'detail', id] as const,
   },
+  artisans: {
+    all: () => [...all, 'artisans'] as const,
+    list: (f: ListFilters) => [...all, 'artisans', 'list', f] as const,
+    detail: (id: string) => [...all, 'artisans', 'detail', id] as const,
+  },
   users: {
     all: () => [...all, 'users'] as const,
     list: (f: ListFilters) => [...all, 'users', 'list', f] as const,

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import { IconArrowRight, IconCheck } from './icons';
 
@@ -109,7 +110,7 @@ export function Hero() {
       {/* ---------------- Centre column ---------------- */}
       <div className="shell relative z-10">
         <div className="mx-auto max-w-[34rem] text-center sm:max-w-[38rem] lg:max-w-[28rem] xl:max-w-[34rem]">
-          <p className="kicker text-[var(--muted)]">Escrow-protected hiring</p>
+          <p className="kicker text-[var(--muted)]">Now onboarding artisans</p>
 
           <h1 className="mt-7 text-[clamp(2.4rem,5.4vw,3.85rem)]">
             Hire an artisan. Hold the money <em>until the work is done</em>.
@@ -121,12 +122,12 @@ export function Hero() {
           </p>
 
           <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <a href="#waitlist" className="btn btn-primary w-full sm:w-auto">
-              Join the waitlist
+            <Link href="/for-artisans" className="btn btn-primary w-full sm:w-auto">
+              I&rsquo;m an artisan — join now
               <IconArrowRight className="h-4 w-4" />
-            </a>
-            <a href="#escrow" className="btn btn-ghost w-full sm:w-auto">
-              See how escrow works
+            </Link>
+            <a href="#waitlist" className="btn btn-ghost w-full sm:w-auto">
+              I need work done
             </a>
           </div>
 

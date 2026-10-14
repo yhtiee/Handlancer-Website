@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import Image from 'next/image';
 import { Reveal } from './reveal';
 
@@ -11,6 +12,7 @@ const TRACKS = {
     image: '/brand/working-woman.webp',
     imageAlt: 'Nigerian artisan ready to take on a job booked through HandLancer',
     cta: 'Join the customer waitlist',
+    href: '/#waitlist',
     steps: [
       {
         t: 'Post the job, or pick your artisan',
@@ -34,7 +36,8 @@ const TRACKS = {
     label: 'I provide services',
     image: '/brand/working-man.webp',
     imageAlt: 'Verified Nigerian tradesman earning through the HandLancer app',
-    cta: 'Join the artisan waitlist',
+    cta: 'Join as an artisan',
+    href: '/for-artisans',
     steps: [
       {
         t: 'Build a profile that wins work',
@@ -145,9 +148,9 @@ export function HowItWorks() {
                   className="h-auto w-full object-cover"
                 />
               </div>
-              <a href="#waitlist" className="btn btn-ghost mt-5 w-full">
+              <Link href={track.href} className="btn btn-ghost mt-5 w-full">
                 {track.cta}
-              </a>
+              </Link>
             </div>
           </Reveal>
         </div>

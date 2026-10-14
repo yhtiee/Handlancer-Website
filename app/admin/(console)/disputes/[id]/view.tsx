@@ -90,7 +90,7 @@ export function DisputeView({ id }: { id: string }) {
           </Section>
         </div>
 
-        <aside className="lg:sticky lg:top-10 lg:self-start">
+        <aside className="lg:sticky lg:top-24 lg:self-start">
           {d.isLive ? (
             <Section title="Settle this dispute">
               {escrow && d.held > 0 ? (

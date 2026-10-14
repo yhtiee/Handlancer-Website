@@ -10,14 +10,20 @@ import { IconArrowRight } from './icons';
  * sub-page has already made its argument by the time the reader gets here.
  *
  * Links are rooted (`/#waitlist`, not `#waitlist`) so they work from any route.
+ * The primary defaults to the customer waitlist (sub-pages are mostly read by
+ * people hiring); artisan pages pass their own.
  */
 export function CtaCompact({
   heading,
   emphasis,
   lede,
+  primaryHref = '/#waitlist',
+  primaryLabel = 'Join the customer waitlist',
   secondaryHref = '/#escrow',
   secondaryLabel = 'How escrow works',
 }: {
+  primaryHref?: string;
+  primaryLabel?: string;
   heading: string;
   /** The italic phrase, appended to the heading. */
   emphasis: string;
@@ -38,8 +44,8 @@ export function CtaCompact({
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row lg:justify-end">
-              <Link href="/#waitlist" className="btn btn-primary">
-                Join the waitlist
+              <Link href={primaryHref} className="btn btn-primary">
+                {primaryLabel}
                 <IconArrowRight className="h-4 w-4" />
               </Link>
               <Link href={secondaryHref} className="btn btn-ghost">

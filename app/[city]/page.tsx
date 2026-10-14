@@ -182,7 +182,9 @@ export default async function CityPage({ params }: { params: Promise<{ city: str
         <CtaCompact
           heading={`${city.name} goes first.`}
           emphasis="Be on the list."
-          lede={`We open city by city, and ${city.name} is first. Join the waitlist and we will let you in as soon as we go live.`}
+          lede={`We open city by city, and ${city.name} is first. Artisans are joining now; join the customer waitlist and we will let you in as soon as we open to customers.`}
+          secondaryHref="/for-artisans"
+          secondaryLabel={`Work in ${city.name}? Join`}
         />
       </main>
       <Footer />

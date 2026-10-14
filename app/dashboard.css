@@ -1,5 +1,5 @@
 /* ==========================================================================
-   HandLancer admin console
+   HandLancer dashboards — the admin console (.admin) and the app (.hl-app)
    --------------------------------------------------------------------------
    The marketing site's system (globals.css + DESIGN-SYSTEM.md), applied at
    dashboard density. Nothing here introduces a new colour, face or idiom:
@@ -13,10 +13,11 @@
      shape    square bordered panels, 6px controls (.btn is the site's own),
               no shadows, no blur.
 
-   Scoped under `.admin` so none of it reaches a marketing page.
+   Scoped under `.admin` / `.hl-app` so none of it reaches a marketing page.
+   The print rules at the end are the admin analytics export only.
    ========================================================================== */
 
-.admin {
+:is(.admin, .hl-app) {
   --sidebar-w: 248px;
 
   font-size: 14px;
@@ -27,21 +28,21 @@
 
 /* Headings keep the site's weight, navy and -0.03em tracking (globals.css);
    only the size comes down for a working surface. */
-.admin h1 { font-size: 26px; line-height: 1.15; }
-.admin h2 { font-size: 16px; line-height: 1.3; letter-spacing: -0.02em; }
-.admin h3 { font-size: 14px; line-height: 1.3; letter-spacing: -0.01em; }
+:is(.admin, .hl-app) h1 { font-size: 26px; line-height: 1.15; }
+:is(.admin, .hl-app) h2 { font-size: 16px; line-height: 1.3; letter-spacing: -0.02em; }
+:is(.admin, .hl-app) h3 { font-size: 14px; line-height: 1.3; letter-spacing: -0.01em; }
 @media (min-width: 768px) {
-  .admin h1 { font-size: 30px; }
+  :is(.admin, .hl-app) h1 { font-size: 30px; }
 }
 
 /* Page lede: the site's .lede face and colour at console size. */
-.admin .lede { font-size: 16.5px; line-height: 1.5; }
+:is(.admin, .hl-app) .lede { font-size: 16.5px; line-height: 1.5; }
 
-.admin .num { font-variant-numeric: tabular-nums; }
+:is(.admin, .hl-app) .num { font-variant-numeric: tabular-nums; }
 
 /* Structural label — .marker's type without its rule. Panel titles, table
    headers, stat labels. */
-.admin .label {
+:is(.admin, .hl-app) .label {
   font-family: var(--font-plex-mono), ui-monospace, monospace;
   font-size: 11.5px;
   font-weight: 500;
@@ -52,35 +53,35 @@
 
 /* The site's .btn is 15px / 13×22 for marketing CTAs; the console uses it at
    the nav's size override (!py-2.5 !text-[14.5px] in nav.tsx). */
-.admin .btn { padding: 9px 16px; font-size: 14px; }
-.admin .btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.admin .btn-primary:disabled:hover { background: var(--teal); }
+:is(.admin, .hl-app) .btn { padding: 9px 16px; font-size: 14px; }
+:is(.admin, .hl-app) .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+:is(.admin, .hl-app) .btn-primary:disabled:hover { background: var(--teal); }
 
 /* Component classes live in the components layer so Tailwind utilities on the
    same element (pl-9, w-full, …) win, as they would for any Tailwind class. */
 @layer components {
   /* Bordered panel (DESIGN-SYSTEM §5): square, hairline, paper. */
-  .admin .card {
+  :is(.admin, .hl-app) .card {
     background: var(--paper);
     border: 1px solid var(--rule);
   }
 
   /* Grid-lines-are-real (services.tsx): the 1px gap IS the border. */
-  .admin .ruled-grid {
+  :is(.admin, .hl-app) .ruled-grid {
     display: grid;
     gap: 1px;
     background: var(--rule);
     border: 1px solid var(--rule);
   }
-  .admin .ruled-grid > * { background: var(--paper); }
+  :is(.admin, .hl-app) .ruled-grid > * { background: var(--paper); }
 
   /* ---------- Tables ---------- */
 
-  .admin .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  :is(.admin, .hl-app) .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
 
-  .admin table.data { width: 100%; border-collapse: collapse; }
+  :is(.admin, .hl-app) table.data { width: 100%; border-collapse: collapse; }
 
-  .admin table.data th {
+  :is(.admin, .hl-app) table.data th {
     text-align: left;
     font-family: var(--font-plex-mono), ui-monospace, monospace;
     font-weight: 500;
@@ -93,23 +94,23 @@
     white-space: nowrap;
   }
 
-  .admin table.data td {
+  :is(.admin, .hl-app) table.data td {
     padding: 13px 16px;
     border-bottom: 1px solid var(--rule);
     vertical-align: middle;
   }
 
-  .admin table.data tbody tr:last-child td { border-bottom: 0; }
-  .admin table.data tbody tr { transition: background-color 180ms ease; }
-  .admin table.data tbody tr:hover { background: var(--band); }
+  :is(.admin, .hl-app) table.data tbody tr:last-child td { border-bottom: 0; }
+  :is(.admin, .hl-app) table.data tbody tr { transition: background-color 180ms ease; }
+  :is(.admin, .hl-app) table.data tbody tr:hover { background: var(--band); }
 
   /* The primary cell's link covers the whole row, so any row is one click. */
-  .admin table.data tr.row-link { position: relative; }
-  .admin table.data tr.row-link a.row-anchor::after { content: ''; position: absolute; inset: 0; }
+  :is(.admin, .hl-app) table.data tr.row-link { position: relative; }
+  :is(.admin, .hl-app) table.data tr.row-link a.row-anchor::after { content: ''; position: absolute; inset: 0; }
 
   /* ---------- Inputs (waitlist form idiom: rounded-md, --rule-strong) ---------- */
 
-  .admin .input {
+  :is(.admin, .hl-app) .input {
     height: 40px;
     width: 100%;
     border: 1px solid var(--rule-strong);
@@ -120,14 +121,14 @@
     color: var(--ink);
     transition: border-color 180ms ease;
   }
-  .admin textarea.input { height: auto; padding: 10px 12px; min-height: 96px; resize: vertical; }
-  .admin .input:hover { border-color: var(--muted); }
-  .admin .input:focus { border-color: var(--navy); }
+  :is(.admin, .hl-app) textarea.input { height: auto; padding: 10px 12px; min-height: 96px; resize: vertical; }
+  :is(.admin, .hl-app) .input:hover { border-color: var(--muted); }
+  :is(.admin, .hl-app) .input:focus { border-color: var(--navy); }
 }
 
 /* The row link draws the focus ring on the whole row instead of the cell. */
-.admin table.data tr.row-link a.row-anchor:focus-visible { outline: none; }
-.admin table.data tr.row-link:has(a.row-anchor:focus-visible) {
+:is(.admin, .hl-app) table.data tr.row-link a.row-anchor:focus-visible { outline: none; }
+:is(.admin, .hl-app) table.data tr.row-link:has(a.row-anchor:focus-visible) {
   outline: 2px solid var(--navy);
   outline-offset: -2px;
 }
@@ -138,36 +139,36 @@
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: none; }
 }
-.admin .enter { animation: admin-enter 420ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
+:is(.admin, .hl-app) .enter { animation: admin-enter 420ms cubic-bezier(0.2, 0.7, 0.3, 1) both; }
 
 @keyframes admin-pulse {
   50% { opacity: 0.55; }
 }
-.admin .skeleton {
+:is(.admin, .hl-app) .skeleton {
   background: var(--band-deep);
   animation: admin-pulse 1.4s ease-in-out infinite;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .admin .enter, .admin .skeleton { animation: none; }
-  .admin * { transition: none !important; }
+  :is(.admin, .hl-app) .enter, :is(.admin, .hl-app) .skeleton { animation: none; }
+  :is(.admin, .hl-app) * { transition: none !important; }
 }
 
 /* ---------- Charts (components/admin/charts) ---------- */
 
-.admin .chart-tick {
+:is(.admin, .hl-app) .chart-tick {
   font-family: var(--font-plex-mono), ui-monospace, monospace;
   font-size: 11px;
   fill: var(--muted);
 }
-.admin .chart-end {
+:is(.admin, .hl-app) .chart-end {
   font-family: var(--font-plex-mono), ui-monospace, monospace;
   font-size: 11.5px;
   font-weight: 600;
   fill: var(--ink);
 }
-.admin .chart-empty { font-size: 13px; fill: var(--muted); }
-.admin .chart-empty-block { padding: 44px 0; text-align: center; color: var(--muted); }
+:is(.admin, .hl-app) .chart-empty { font-size: 13px; fill: var(--muted); }
+:is(.admin, .hl-app) .chart-empty-block { padding: 44px 0; text-align: center; color: var(--muted); }
 
 /* ---------- Print: the analytics PDF export ---------- */
 
