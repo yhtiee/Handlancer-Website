@@ -111,3 +111,72 @@ export async function resolveDispute(input: ResolveInput): Promise<ActionResult>
 
   return { ok: true };
 }
+
+// ─────────────────────────── Artisan review ───────────────────────────
+
+export type ArtisanDecision = 'approve' | 'request_changes' | 'suspend';
+
+export type ReviewArtisanInput = {
+  artisanId: string;
+  decision: ArtisanDecision;
+  /** Shown to the artisan. Required to request changes or suspend. */
+  note?: string;
+};
+
+const DECISIONS: Record<ArtisanDecision, { status: 'approved' | 'rejected' | 'suspended'; notification: string; from: string[] }> = {
+  // Approving a suspended artisan reinstates them; a pending one is the normal case.
+  approve: { status: 'approved', notification: 'artisan_approved', from: ['pending', 'rejected', 'suspended'] },
+  request_changes: { status: 'rejected', notification: 'artisan_changes_requested', from: ['pending'] },
+  suspend: { status: 'suspended', notification: 'artisan_suspended', from: ['approved'] },
+};
+
+/**
+ * Approve an artisan (they become discoverable and can quote), send their
+ * application back with a note, or suspend an approved one. The service role
+ * is the only writer the guard trigger in supabase/artisan_review.sql lets
+ * change provider_status this way; the artisan is notified in the app (and by
+ * push, through the notifications pipeline).
+ */
+export async function reviewArtisan(input: ReviewArtisanInput): Promise<ActionResult<{ status: string }>> {
+  const admin = await requireAdmin();
+  const rule = DECISIONS[input.decision];
+  if (!rule) return { ok: false, error: 'Choose a decision.' };
+
+  const note = input.note?.trim() ?? '';
+  if (input.decision !== 'approve' && note.length < 10) {
+    return { ok: false, error: 'Tell the artisan why, in a sentence they can act on (10+ characters).' };
+  }
+
+  const db = serviceClient();
+  const { data: current, error: readError } = await db
+    .from('profiles')
+    .select('id, role, provider_status')
+    .eq('id', input.artisanId)
+    .maybeSingle();
+  if (readError) return { ok: false, error: readError.message };
+  if (!current || current.role !== 'provider') return { ok: false, error: 'This artisan no longer exists.' };
+  if (!rule.from.includes(current.provider_status ?? '')) {
+    return { ok: false, error: `This application is ${current.provider_status ?? 'not submitted'} — reload to see its latest state.` };
+  }
+
+  const { error } = await db
+    .from('profiles')
+    .update({
+      provider_status: rule.status,
+      provider_reviewed_at: new Date().toISOString(),
+      provider_reviewed_by: admin.userId,
+      provider_review_note: input.decision === 'approve' ? null : note,
+    })
+    .eq('id', input.artisanId)
+    // Only if nobody else decided first.
+    .eq('provider_status', current.provider_status!);
+  if (error) return { ok: false, error: error.message };
+
+  // Best effort: the decision stands even if the notification fails.
+  await db
+    .from('notifications')
+    .insert({ user_id: input.artisanId, type: rule.notification, payload: input.decision === 'approve' ? {} : { note } })
+    .then(({ error: e }) => e && console.error('[admin] artisan notification failed:', e.message));
+
+  return { ok: true, status: rule.status };
+}

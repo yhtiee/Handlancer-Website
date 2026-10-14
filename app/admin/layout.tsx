@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 
 import { QueryProvider } from '@/components/admin/query-provider';
 
-import './admin.css';
+import '../dashboard.css';
 
 /*
  * Everything under /admin: the sign-in screen and the console (the `(console)`

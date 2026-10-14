@@ -11,9 +11,10 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
-import { resolveDispute, signIn, signOut, type ActionResult, type ResolveInput } from '@/app/admin/actions';
+import { resolveDispute, reviewArtisan, signIn, signOut, type ActionResult, type ResolveInput, type ReviewArtisanInput } from '@/app/admin/actions';
 import { parseRangeParams, rangeToSearch, type RangeParams } from '@/lib/admin/analytics/range';
 import type { AnalyticsReport } from '@/lib/admin/analytics/types';
+import type { getArtisan, listArtisans } from '@/lib/admin/data/artisans';
 import type { getDispute, listDisputes } from '@/lib/admin/data/disputes';
 import type { getJob, listJobs } from '@/lib/admin/data/jobs';
 import type { Badges, Overview } from '@/lib/admin/data/overview';
@@ -118,6 +119,8 @@ export const useDisputes = (f: ListFilters) =>
   useAdminQuery(list<Data<typeof listDisputes>>(adminKeys.disputes.list(f), '/disputes', f));
 export const useJobs = (f: ListFilters) =>
   useAdminQuery(list<Data<typeof listJobs>>(adminKeys.jobs.list(f), '/jobs', f));
+export const useArtisans = (f: ListFilters) =>
+  useAdminQuery(list<Data<typeof listArtisans>>(adminKeys.artisans.list(f), '/artisans', f));
 export const useUsers = (f: ListFilters) =>
   useAdminQuery(list<Data<typeof listUsers>>(adminKeys.users.list(f), '/users', f));
 export const useTransactions = (f: ListFilters) =>
@@ -138,6 +141,8 @@ export const useJob = (id: string) =>
   useAdminQuery({ queryKey: adminKeys.jobs.detail(id), queryFn: () => apiGet<Detail<typeof getJob>>(`/jobs/${id}`) });
 export const useUser = (id: string) =>
   useAdminQuery({ queryKey: adminKeys.users.detail(id), queryFn: () => apiGet<Detail<typeof getUser>>(`/users/${id}`) });
+export const useArtisan = (id: string) =>
+  useAdminQuery({ queryKey: adminKeys.artisans.detail(id), queryFn: () => apiGet<Detail<typeof getArtisan>>(`/artisans/${id}`) });
 
 // ─────────────────────────── Analytics ───────────────────────────
 
@@ -175,6 +180,7 @@ const SECTION_QUERIES: Record<string, { key: readonly unknown[]; path: string }>
   // The key a list page builds from an empty URL: parseFilters(…) → { page: 1 }.
   '/admin/disputes': { key: adminKeys.disputes.list({ page: 1 }), path: '/disputes' },
   '/admin/jobs': { key: adminKeys.jobs.list({ page: 1 }), path: '/jobs' },
+  '/admin/artisans': { key: adminKeys.artisans.list({ page: 1 }), path: '/artisans' },
   '/admin/users': { key: adminKeys.users.list({ page: 1 }), path: '/users' },
   '/admin/transactions': { key: adminKeys.transactions.list({ page: 1 }), path: '/transactions' },
   '/admin/waitlist': { key: adminKeys.waitlist.list({ page: 1 }), path: '/waitlist' },
@@ -194,7 +200,7 @@ export function usePrefetchSection() {
 }
 
 /** For list rows: warm the record the row opens. */
-export function usePrefetchDetail(resource: 'disputes' | 'jobs' | 'users') {
+export function usePrefetchDetail(resource: 'disputes' | 'jobs' | 'users' | 'artisans') {
   const queryClient = useQueryClient();
   return useCallback(
     (id: string) =>
@@ -251,6 +257,18 @@ export function useResolveDispute() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: ResolveInput) => unwrap(resolveDispute(input)),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.all }),
+  });
+}
+
+/**
+ * A decision changes the artisan's row, the queue they sit in, the sidebar
+ * count and the users list — refetch everything under ['admin'].
+ */
+export function useReviewArtisan() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: ReviewArtisanInput) => unwrap(reviewArtisan(input)),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.all }),
   });
 }

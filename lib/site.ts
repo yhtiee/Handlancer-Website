@@ -245,7 +245,11 @@ export type Faq = { q: string; a: string };
 export const FAQS: Faq[] = [
   {
     q: 'Is HandLancer available yet?',
-    a: 'Not yet — HandLancer is in build and we are opening city by city. Join the waitlist and we will email you the moment it goes live where you are. Customers and artisans have separate lists, so tell us which one you are; artisans on the list get their profiles reviewed and verified before customers start posting.',
+    a: 'For artisans, yes — you can join today in your browser at handlancer.com/app, with nothing to download, and every application is reviewed by a person before it goes live. For customers, not yet: we are opening city by city once there are approved artisans to hire. Join the customer waitlist and we will email you the moment your city opens.',
+  },
+  {
+    q: 'How do I join HandLancer as an artisan?',
+    a: 'Create an account at handlancer.com/app and choose “I do the work”. Add your photo, phone number, area, trades, experience and a few photos of work you have done, then accept the artisan rules and submit. A person at HandLancer reviews your application and may call you; once you are approved, customers can find you and you can quote on open jobs. Joining is free and HandLancer takes no commission.',
   },
   {
     q: 'How does HandLancer escrow protect my money?',

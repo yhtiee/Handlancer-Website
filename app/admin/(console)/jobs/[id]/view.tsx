@@ -95,7 +95,7 @@ export function JobView({ id }: { id: string }) {
           </Section>
         </div>
 
-        <aside className="space-y-4 md:space-y-6 lg:sticky lg:top-10 lg:self-start">
+        <aside className="space-y-4 md:space-y-6 lg:sticky lg:top-24 lg:self-start">
           <Section title="Escrow">
             {escrow ? (
               <div className="space-y-5">

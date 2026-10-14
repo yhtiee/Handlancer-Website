@@ -43,6 +43,38 @@ export type Profile = {
   rating: number | null;
   hourly_rate: number | null;
   years_experience: number | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  /** supabase/artisan_review.sql. Null for clients. */
+  provider_status: ProviderStatus | null;
+  provider_submitted_at: string | null;
+  provider_reviewed_at: string | null;
+  provider_reviewed_by: string | null;
+  provider_review_note: string | null;
+  provider_terms_accepted_at: string | null;
+  work_photos: string[] | null;
+  deleted_at?: string | null;
+  created_at: string;
+};
+
+export type ProviderStatus = 'draft' | 'pending' | 'approved' | 'rejected' | 'suspended';
+
+export type ReviewRow = {
+  id: string;
+  job_id: string;
+  reviewer_id: string;
+  provider_id: string;
+  rating: number;
+  comment: string | null;
+  created_at: string;
+};
+
+export type Notification = {
+  id: string;
+  user_id: string;
+  type: string;
+  payload: Record<string, unknown>;
+  read: boolean;
   created_at: string;
 };
 
@@ -178,6 +210,8 @@ export type Database = {
       wallet_security: Table<WalletSecurity>;
       waitlist: Table<WaitlistEntry>;
       admin_users: Table<AdminUser>;
+      notifications: Table<Notification>;
+      reviews: Table<ReviewRow>;
     };
     Views: Record<string, never>;
     Functions: {

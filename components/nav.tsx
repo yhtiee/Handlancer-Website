@@ -88,8 +88,14 @@ export function Nav() {
             >
               {FAQ_LINK.label}
             </Link>
-            <Link href="/#waitlist" className="btn btn-primary !py-2.5 !text-[14.5px]">
-              Join the waitlist
+            <Link
+              href="/app"
+              className="cursor-pointer text-[14.5px] font-medium text-[var(--muted)] transition-colors duration-200 hover:text-[var(--ink)]"
+            >
+              Sign in
+            </Link>
+            <Link href="/for-artisans" className="btn btn-primary !py-2.5 !text-[14.5px]">
+              Join as an artisan
             </Link>
           </div>
 
@@ -122,11 +128,18 @@ export function Nav() {
         </ul>
         <div className="shell mt-8">
           <Link
-            href="/#waitlist"
+            href="/for-artisans"
             onClick={() => setOpen(false)}
             className="btn btn-primary w-full !py-4 !text-base"
           >
-            Join the waitlist
+            Join as an artisan
+          </Link>
+          <Link
+            href="/app"
+            onClick={() => setOpen(false)}
+            className="btn btn-ghost mt-3 w-full !py-4 !text-base"
+          >
+            Sign in
           </Link>
         </div>
       </div>

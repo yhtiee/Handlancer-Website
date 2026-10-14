@@ -86,3 +86,6 @@ export const IconImage = (p: P) => (
 export const IconInfo = (p: P) => (
   <Svg {...p}><circle cx="12" cy="12" r="8.5" /><path d="M12 11v5" /><path d="M12 8h.01" /></Svg>
 );
+export const IconIdBadge = (p: P) => (
+  <Svg {...p}><rect x="3.5" y="5" width="17" height="14" rx="2" /><circle cx="9" cy="11" r="2.2" /><path d="M5.8 16.2a3.6 3.6 0 0 1 6.4 0" /><path d="M14.5 10h3.5M14.5 13.5h2.5" /></Svg>
+);

@@ -25,8 +25,8 @@ export const metadata: Metadata = buildMetadata({
 
 const ROUTES: [string, string][] = [
   [
-    'Joining the waitlist',
-    'The fastest route in is the waitlist itself — customers and artisans have separate lists, so tell us which one you are.',
+    'Joining HandLancer',
+    'Artisans can join today at handlancer.com/app — no email to us needed. Customers: the waitlist on the homepage is the fastest way in.',
   ],
   [
     'Artisan verification',
@@ -125,7 +125,9 @@ export default function Contact() {
         <CtaCompact
           heading="Or skip the email."
           emphasis="Join the list."
-          lede="The waitlist is the fastest way in. We will email you the moment HandLancer opens in your city."
+          lede="Customers: the waitlist is the fastest way in. We will email you the moment HandLancer opens in your city."
+          secondaryHref="/for-artisans"
+          secondaryLabel="I’m an artisan"
         />
       </main>
       <Footer />

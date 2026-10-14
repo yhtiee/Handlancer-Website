@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { requireAdmin } from '@/lib/admin/auth';
+import { countPendingArtisans } from '@/lib/admin/data/artisans';
 import { heldAmount, profilesById } from '@/lib/admin/data/shared';
 import { serviceClient } from '@/lib/admin/supabase';
 import type { JobStatus } from '@/lib/admin/types';
@@ -107,11 +108,11 @@ export type Overview = Awaited<ReturnType<typeof getOverview>>;
 /** Sidebar counts. Cheap (head-only) so the shell can poll it. */
 export async function getBadges() {
   await requireAdmin();
-  const { count } = await serviceClient()
-    .from('disputes')
-    .select('id', { count: 'exact', head: true })
-    .in('status', ['open', 'in_review']);
-  return { openDisputes: count ?? 0 };
+  const [{ count }, pendingArtisans] = await Promise.all([
+    serviceClient().from('disputes').select('id', { count: 'exact', head: true }).in('status', ['open', 'in_review']),
+    countPendingArtisans(),
+  ]);
+  return { openDisputes: count ?? 0, pendingArtisans };
 }
 
 export type Badges = Awaited<ReturnType<typeof getBadges>>;

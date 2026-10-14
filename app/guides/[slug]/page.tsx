@@ -264,7 +264,7 @@ export default async function GuidePage({ params }: { params: Promise<{ slug: st
         <CtaCompact
           heading="Know what to ask?"
           emphasis="Now get quotes."
-          lede="HandLancer is still in build. Join the waitlist and we will email you the moment we open in your city."
+          lede="HandLancer is opening to customers city by city. Join the waitlist and we will email you the moment we open in yours."
         />
       </main>
       <Footer />

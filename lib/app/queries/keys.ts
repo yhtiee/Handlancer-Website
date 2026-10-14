@@ -1,0 +1,56 @@
+// Ported from Handlancer-Mobile-Application/src/queries/keys.ts @ 8968d5c — keep the diff minimal so later syncs stay easy.
+import type { ProviderJobSegment, UserJobSegment } from '@/lib/app/services/jobs';
+
+/** Centralized TanStack Query keys. Keeps invalidation consistent across the app. */
+export const queryKeys = {
+  profile: (id: string) => ['profile', id] as const,
+  /** `filterKey` comes from serializeProviderFilters — an object breaks caching. */
+  providers: (search?: string, filterKey?: string) =>
+    ['providers', search ?? '', filterKey ?? ''] as const,
+  providersCount: (search?: string, filterKey?: string) =>
+    ['providers-count', search ?? '', filterKey ?? ''] as const,
+
+  jobs: {
+    /**
+     * Segment is part of the key because the status filter now runs in Postgres:
+     * each segment is a separate paginated result, not a slice of one list.
+     * Mutations should invalidate the `*All` prefixes, which match every segment.
+     */
+    mine: (segment: UserJobSegment) => ['jobs', 'mine', segment] as const,
+    /** Under the `mineAll` prefix, so every job mutation refreshes the counts too. */
+    mineCount: (segment: UserJobSegment) => ['jobs', 'mine', 'count', segment] as const,
+    mineAll: () => ['jobs', 'mine'] as const,
+    hired: (segment: ProviderJobSegment) => ['jobs', 'hired', segment] as const,
+    hiredCount: (segment: ProviderJobSegment) => ['jobs', 'hired', 'count', segment] as const,
+    hiredAll: () => ['jobs', 'hired'] as const,
+    /** `filterKey` comes from serializeFilters — an object here would break caching. */
+    discover: (search?: string, filterKey?: string) =>
+      ['jobs', 'discover', search ?? '', filterKey ?? ''] as const,
+    discoverCount: (search?: string, filterKey?: string) =>
+      ['jobs', 'discover-count', search ?? '', filterKey ?? ''] as const,
+    detail: (id: string) => ['jobs', 'detail', id] as const,
+  },
+
+  providerMedia: (providerId: string) => ['provider-media', providerId] as const,
+
+  quotes: {
+    forJob: (jobId: string) => ['quotes', 'job', jobId] as const,
+    /** All of a provider's quotes, or one status group. Every variant shares the `mine` prefix. */
+    mine: (status = 'all') => (status === 'all' ? (['quotes', 'mine'] as const) : (['quotes', 'mine', status] as const)),
+    mineCount: (status = 'all') => ['quotes', 'mine', 'count', status] as const,
+  },
+
+  wallet: () => ['wallet'] as const,
+  transactions: () => ['transactions'] as const,
+
+  conversations: () => ['conversations'] as const,
+  messages: (conversationId: string) => ['messages', conversationId] as const,
+
+  reviews: (providerId: string) => ['reviews', providerId] as const,
+  jobMedia: (jobId: string) => ['job-media', jobId] as const,
+  /** The live dispute on a job, readable by both parties. */
+  dispute: (jobId: string) => ['dispute', jobId] as const,
+  notifications: () => ['notifications', 'list'] as const,
+  /** Counted in Postgres — the list is paginated, so it can't be counted here. */
+  unreadCount: () => ['notifications', 'unread-count'] as const,
+} as const;

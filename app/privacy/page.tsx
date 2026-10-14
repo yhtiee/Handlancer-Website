@@ -285,7 +285,8 @@ const SECTIONS: LegalSection[] = [
     heading: 'The website',
     id: 'website',
     paragraphs: [
-      'Before launch, www.handlancer.com collects only what you type into the waitlist form: your name, email, city, chosen trade and whether you are a customer or an artisan, plus optionally your phone number, years of experience or how you heard about us. We use it to tell you when HandLancer opens in your city and to decide which cities to open next. The form submits to our server, and entries are stored with Supabase.',
+      'The HandLancer app also runs in your browser at www.handlancer.com/app. It is the same app with the same account: it collects and uses the information described in the rest of this policy, and keeps you signed in with a session cookie that is needed for it to work.',
+      'The rest of the website collects only what you type into the waitlist form: your name, email, city, chosen trade and whether you are a customer or an artisan, plus optionally your phone number, years of experience or how you heard about us. We use it to tell you when HandLancer opens in your city and to decide which cities to open next. The form submits to our server, and entries are stored with Supabase.',
       'The website sets no advertising or analytics cookies and does not track you across other sites.',
     ],
   },

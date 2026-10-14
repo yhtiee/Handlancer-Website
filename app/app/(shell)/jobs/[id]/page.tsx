@@ -1,0 +1,9 @@
+import type { Metadata } from 'next';
+
+import { JobView } from './job-view';
+
+export const metadata: Metadata = { title: 'Job' };
+
+export default function JobPage() {
+  return <JobView />;
+}

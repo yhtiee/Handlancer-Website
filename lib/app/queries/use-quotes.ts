@@ -1,0 +1,104 @@
+// Ported from Handlancer-Mobile-Application/src/queries/use-quotes.ts @ 8968d5c — keep the diff minimal so later syncs stay easy.
+import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
+import { useAuth } from '@/lib/app/auth';
+import { queryKeys } from '@/lib/app/queries/keys';
+import type { Quote, QuoteStatus } from '@/lib/app/services/database.types';
+import {
+  approveQuote,
+  countMyQuotes,
+  getMyQuoteForJob,
+  getQuote,
+  listMyQuotes,
+  listQuotesForJob,
+  rejectQuote,
+  submitQuote,
+  type QuoteInput,
+} from '@/lib/app/services/quotes';
+
+export function useJobQuotes(jobId: string) {
+  return useQuery({
+    queryKey: queryKeys.quotes.forJob(jobId),
+    queryFn: () => listQuotesForJob(jobId),
+    enabled: !!jobId,
+  });
+}
+
+/** The provider's own quotes, paginated. */
+export function useMyQuotes(statuses?: QuoteStatus[]) {
+  const { session } = useAuth();
+  const providerId = session?.user.id;
+  return useInfiniteQuery({
+    queryKey: queryKeys.quotes.mine(statuses?.join('+')),
+    queryFn: ({ pageParam }) => listMyQuotes(providerId!, pageParam, statuses),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => lastPage.nextPage,
+    enabled: !!providerId,
+  });
+}
+
+export function useMyQuotesCount(statuses?: QuoteStatus[]) {
+  const { session } = useAuth();
+  const providerId = session?.user.id;
+  return useQuery({
+    queryKey: queryKeys.quotes.mineCount(statuses?.join('+')),
+    queryFn: () => countMyQuotes(providerId!, statuses),
+    enabled: !!providerId,
+  });
+}
+
+export function useQuote(id: string) {
+  return useQuery({
+    queryKey: ['quote', id] as const,
+    queryFn: () => getQuote(id),
+    enabled: !!id,
+  });
+}
+
+export function useMyQuoteForJob(jobId: string) {
+  const { session } = useAuth();
+  const providerId = session?.user.id;
+  return useQuery({
+    queryKey: ['quote', 'mine', jobId] as const,
+    queryFn: () => getMyQuoteForJob(providerId!, jobId),
+    enabled: !!providerId && !!jobId,
+  });
+}
+
+export function useSubmitQuote(jobId: string) {
+  const { session } = useAuth();
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: QuoteInput) => submitQuote(session!.user.id, jobId, input),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.quotes.mine() });
+      qc.invalidateQueries({ queryKey: queryKeys.quotes.forJob(jobId) });
+      qc.invalidateQueries({ queryKey: ['quote', 'mine', jobId] });
+    },
+  });
+}
+
+export function useApproveQuote(jobId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (quote: Quote) => approveQuote(quote),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.quotes.forJob(jobId) });
+      qc.invalidateQueries({ queryKey: queryKeys.jobs.detail(jobId) });
+      // Approving hires the provider and moves the job to in_progress, so it
+      // leaves "Open" and enters "Active" for the customer, and appears in the
+      // provider's hired list.
+      qc.invalidateQueries({ queryKey: queryKeys.jobs.mineAll() });
+      qc.invalidateQueries({ queryKey: queryKeys.jobs.hiredAll() });
+      qc.invalidateQueries({ queryKey: queryKeys.quotes.mine() });
+    },
+  });
+}
+
+export function useRejectQuote(jobId: string) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => rejectQuote(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.quotes.forJob(jobId) }),
+  });
+}

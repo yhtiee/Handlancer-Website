@@ -1,33 +1,27 @@
 'use client';
 
-import { useActionState, useId, useState } from 'react';
+import Link from 'next/link';
+import { useActionState, useId } from 'react';
 import { joinWaitlist } from '@/app/actions';
-import { EMPTY_STATE, type WaitlistRole } from '@/lib/waitlist';
+import { EMPTY_STATE } from '@/lib/waitlist';
 import { CATEGORIES, CITIES } from '@/lib/site';
 import { Reveal } from './reveal';
 import { IconArrowRight, IconCheck } from './icons';
 
-const COPY: Record<WaitlistRole, { tab: string; lead: string; categoryLabel: string; bullets: string[] }> = {
-  user: {
-    tab: 'I need a job done',
-    lead: 'Be first to post a job when HandLancer opens in your city.',
-    categoryLabel: 'What do you need help with?',
-    bullets: [
-      'First access when we launch in your city',
-      'Your first job posted free, always',
-      'No card, no commitment — just an email',
-    ],
-  },
-  provider: {
-    tab: 'I provide services',
-    lead: 'Get your profile in early, before customers start posting.',
-    categoryLabel: 'What is your main trade?',
-    bullets: [
-      'Early profiles are reviewed and verified first',
-      'Quote on jobs from day one, free',
-      'We will call you before we launch in your area',
-    ],
-  },
+/*
+ * Customers only. Artisans no longer wait: they register in the app and are
+ * reviewed (/for-artisans → /app/apply), so there are verified people to hire
+ * when a city opens to customers. The form, action and table still accept
+ * `provider` rows, so nothing already stored breaks.
+ */
+const COPY = {
+  lead: 'Be first to post a job when HandLancer opens to customers in your city.',
+  categoryLabel: 'What do you need help with?',
+  bullets: [
+    'First access when we open to customers in your city',
+    'Your first job posted free, always',
+    'No card, no commitment — just an email',
+  ],
 };
 
 function Field({
@@ -73,9 +67,8 @@ function Field({
 }
 
 export function Waitlist() {
-  const [role, setRole] = useState<WaitlistRole>('user');
   const [state, formAction, pending] = useActionState(joinWaitlist, EMPTY_STATE);
-  const copy = COPY[role];
+  const copy = COPY;
   const v = state.values ?? {};
   const err = state.errors ?? {};
   const cityListId = useId();
@@ -86,7 +79,7 @@ export function Waitlist() {
       <div className="shell">
         <Reveal>
           <p className="marker">
-            <b>07</b> <span>Waitlist</span>
+            <b>07</b> <span>Customer waitlist</span>
           </p>
         </Reveal>
 
@@ -94,11 +87,12 @@ export function Waitlist() {
           {/* ---- Pitch ---- */}
           <Reveal>
             <h2 className="max-w-[16ch] text-[clamp(2rem,4.4vw,3.05rem)]">
-              We are not live yet. <em>Get in first.</em>
+              Artisans first. <em>Customers next.</em>
             </h2>
             <p className="lede mt-6 max-w-[44ch]">
-              HandLancer is in build. Join the waitlist and we will let you in as soon as we open
-              your city — customers and artisans both.
+              We are signing up and reviewing artisans now, so there are verified people to hire on
+              day one. Join the customer waitlist and we will let you in as soon as your city is
+              ready.
             </p>
 
             <ul className="mt-8 divide-y divide-[var(--rule)] border-y border-[var(--rule)]">
@@ -129,59 +123,31 @@ export function Waitlist() {
                     {state.message}
                   </p>
                   <p className="mt-8 border-t border-[var(--rule)] pt-6 text-[14px] text-[var(--muted)]">
-                    Also{' '}
-                    {role === 'user' ? 'an artisan looking for work' : 'need a job done yourself'}?{' '}
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setRole(role === 'user' ? 'provider' : 'user');
-                        // Full reload clears the action state cleanly; this is a
-                        // one-off after a successful submit, not a hot path.
-                        window.location.hash = '#waitlist';
-                        window.location.reload();
-                      }}
-                      className="ulink cursor-pointer"
-                    >
-                      Join the other list
-                    </button>
+                    An artisan yourself?{' '}
+                    <Link href="/for-artisans" className="ulink">
+                      Join now — no waiting
+                    </Link>
                     .
                   </p>
                 </div>
               ) : (
                 <form action={formAction} noValidate>
-                  {/* Role switch */}
-                  <div
-                    role="tablist"
-                    aria-label="Who are you joining as?"
-                    className="flex border-b border-[var(--rule)]"
+                  {/* Artisans no longer queue here — send them straight in. */}
+                  <Link
+                    href="/for-artisans"
+                    className="flex items-center justify-between gap-3 border-b border-[var(--rule)] bg-[var(--band)] px-6 py-3.5 text-[14px] transition-colors duration-200 hover:bg-[var(--teal-wash)] sm:px-8"
                   >
-                    {(Object.keys(COPY) as WaitlistRole[]).map((k) => {
-                      const active = role === k;
-                      return (
-                        <button
-                          key={k}
-                          role="tab"
-                          type="button"
-                          aria-selected={active}
-                          onClick={() => setRole(k)}
-                          className="flex-1 cursor-pointer px-4 py-4 text-[14px] font-semibold transition-colors duration-200"
-                          style={{
-                            color: active ? 'var(--navy)' : 'var(--muted)',
-                            background: active ? 'var(--paper)' : 'var(--band)',
-                            borderBottom: `2px solid ${active ? 'var(--teal)' : 'transparent'}`,
-                          }}
-                        >
-                          {COPY[k].tab}
-                        </button>
-                      );
-                    })}
-                  </div>
+                    <span className="text-[var(--muted)]">
+                      <b className="font-semibold text-[var(--navy)]">Artisan?</b> You don&rsquo;t need to wait — join now.
+                    </span>
+                    <IconArrowRight className="h-4 w-4 shrink-0 text-[var(--navy)]" />
+                  </Link>
 
                   <div className="px-6 py-7 sm:px-8">
                     <p className="text-[14px] text-[var(--muted)]">{copy.lead}</p>
 
-                    {/* role travels with the submission */}
-                    <input type="hidden" name="role" value={role} />
+                    {/* customers only now; the action still accepts both */}
+                    <input type="hidden" name="role" value="user" />
                     {/* honeypot — visually and programmatically hidden from people */}
                     <div aria-hidden className="hidden">
                       <label htmlFor="company">Company</label>
@@ -275,20 +241,6 @@ export function Waitlist() {
                         )}
                       </div>
 
-                      {role === 'provider' ? (
-                        <Field
-                          label="Years of experience"
-                          name="years"
-                          type="number"
-                          inputMode="numeric"
-                          min={0}
-                          max={60}
-                          error={err.years}
-                          defaultValue={v.years}
-                          placeholder="5"
-                          hint="Optional."
-                        />
-                      ) : (
                         <Field
                           label="How did you hear about us?"
                           name="referral"
@@ -297,7 +249,6 @@ export function Waitlist() {
                           placeholder="A friend, Instagram…"
                           hint="Optional."
                         />
-                      )}
                     </div>
 
                     {state.status === 'error' && state.message && (
@@ -310,7 +261,7 @@ export function Waitlist() {
                     )}
 
                     <button type="submit" disabled={pending} className="btn btn-primary mt-6 w-full disabled:opacity-60">
-                      {pending ? 'Adding you…' : role === 'provider' ? 'Join as an artisan' : 'Join the waitlist'}
+                      {pending ? 'Adding you…' : 'Join the customer waitlist'}
                       {!pending && <IconArrowRight className="h-4 w-4" />}
                     </button>
 

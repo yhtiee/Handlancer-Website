@@ -121,21 +121,21 @@ export default function About() {
             <div className="mt-9 grid gap-10 lg:grid-cols-[1.05fr_.95fr] lg:gap-16">
               <Reveal>
                 <h2 className="max-w-[18ch] text-[clamp(2rem,4.4vw,3.05rem)]">
-                  Pre-launch, and <em>honest about it</em>
+                  Artisans first, and <em>honest about it</em>
                 </h2>
               </Reveal>
               <Reveal delay={80}>
                 <div className="lg:pt-2">
                   <p className="lede max-w-[44ch]">
-                    HandLancer is in build. There is no app to download yet and we are not
-                    pretending otherwise.
+                    Artisans can join today, in the browser, with nothing to download. Customers
+                    come next, city by city, once there are approved artisans to hire.
                   </p>
                   {firstCity && (
                     <p className="mt-4 max-w-[46ch] text-[15px] leading-relaxed text-[var(--muted)]">
                       {firstCity.name}, {firstCity.state} State is our first launch city — the only
-                      one with real local pages today. Customers and artisans have separate
-                      waitlists, and artisans who join early get their profiles reviewed and
-                      verified before customers start posting.{' '}
+                      one with real local pages today. Every artisan application is reviewed by
+                      a person before it goes live, and customers join a waitlist until their city
+                      opens.{' '}
                       <Link href={`/${firstCity.slug}`} className="ulink">
                         See {firstCity.name}
                       </Link>

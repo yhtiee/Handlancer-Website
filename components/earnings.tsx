@@ -1,6 +1,7 @@
 'use client';
 
 import { useId, useState } from 'react';
+import Link from 'next/link';
 import { Reveal } from './reveal';
 import { IconArrowRight } from './icons';
 
@@ -155,10 +156,10 @@ export function Earnings() {
               </div>
 
               <div className="border-t border-[var(--rule)] px-6 py-6">
-                <a href="#waitlist" className="btn btn-primary w-full">
+                <Link href="/for-artisans" className="btn btn-primary w-full">
                   Join as an artisan
                   <IconArrowRight className="h-4 w-4" />
-                </a>
+                </Link>
                 <p className="mt-3 text-center text-[12px] text-[var(--muted)]">
                   Illustrative only — actual earnings depend on the jobs you win.
                 </p>
