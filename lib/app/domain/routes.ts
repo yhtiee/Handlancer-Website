@@ -10,9 +10,20 @@
  * mobile helpers' `shell` argument is gone.
  */
 
+/** Only same-app paths: a `next` parameter must never bounce someone off-site. */
+export function safeNext(next: string | null, fallback: string) {
+  return next && next.startsWith('/app') && !next.startsWith('//') && !next.includes('\\') ? next : fallback;
+}
+
 export const routes = {
   home: '/app',
   signIn: '/app/sign-in',
+  forgotPassword: '/app/forgot-password',
+  resetPassword: '/app/reset-password',
+  /** Enter the code from the sign-up email. */
+  verifyEmail: '/app/verify-email',
+  /** Where the link in a confirmation email lands. */
+  confirmEmail: '/app/confirm-email',
   onboarding: '/app/onboarding',
   /** Artisan application: build the profile, accept the rules, submit for review. */
   apply: '/app/apply',

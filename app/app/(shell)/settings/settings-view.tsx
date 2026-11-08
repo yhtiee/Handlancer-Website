@@ -14,6 +14,7 @@ import { useAuth } from '@/lib/app/auth';
 import { formatMoney } from '@/lib/app/domain/money';
 import { routes } from '@/lib/app/domain/routes';
 import { notifyPermission, requestNotifyPermission, type NotifyPermission } from '@/lib/app/notify';
+import { useEmailPreferences, useUpdateEmailPreferences, type EmailSwitch } from '@/lib/app/queries/use-email-preferences';
 import { useMyJobsCount, useProviderJobsCount } from '@/lib/app/queries/use-jobs';
 import { useWallet } from '@/lib/app/queries/use-wallet';
 import { useWalletSecurity } from '@/lib/app/queries/use-wallet-security';
@@ -52,6 +53,8 @@ export function SettingsView() {
         </Section>
 
         <DeviceNotifications />
+
+        <EmailSettings />
 
         <Section title="Account">
           <button type="button" onClick={() => setDeleting(true)} className="font-semibold text-[var(--bad)] hover:underline">
@@ -109,6 +112,44 @@ function DeviceNotifications() {
           </Button>
         )}
       </div>
+    </Section>
+  );
+}
+
+function EmailSettings() {
+  const provider = useAuth().profile?.role === 'provider';
+  const { data: prefs } = useEmailPreferences();
+  const update = useUpdateEmailPreferences();
+
+  const options: { key: EmailSwitch; title: string; hint: string }[] = [
+    ...(provider ? [{ key: 'job_alerts' as const, title: 'New jobs near you', hint: 'At most one email an hour' }] : []),
+    { key: 'messages', title: 'Messages', hint: 'One email per conversation, however many messages arrive' },
+    { key: 'activity', title: provider ? 'Quote results and reviews' : 'New quotes', hint: provider ? 'When a customer picks someone else, or reviews your work' : 'When an artisan prices your job' },
+  ];
+
+  return (
+    <Section title="Email">
+      <ul className="space-y-3">
+        {options.map((o) => (
+          <li key={o.key}>
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                className="mt-1 size-[18px] shrink-0 accent-[var(--navy)]"
+                disabled={!prefs || update.isPending}
+                checked={prefs?.[o.key] ?? true}
+                onChange={(e) => prefs && update.mutate({ ...prefs, [o.key]: e.target.checked })}
+              />
+              <span>
+                <span className="block text-[15px] font-semibold text-[var(--ink)]">{o.title}</span>
+                <span className="block text-[13.5px] text-[var(--muted)]">{o.hint}</span>
+              </span>
+            </label>
+          </li>
+        ))}
+      </ul>
+      <p className="mt-3 text-[13.5px] text-[var(--muted)]">Emails about your account, payments, jobs you’re on and disputes always reach you.</p>
+      {update.isError && <div className="mt-3"><ErrorNote>That didn’t save. Check your connection and try again.</ErrorNote></div>}
     </Section>
   );
 }

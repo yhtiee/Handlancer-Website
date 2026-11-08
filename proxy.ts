@@ -20,7 +20,13 @@ import { NextResponse, type NextRequest } from 'next/server';
  */
 
 /** /app screens a signed-out visitor may see. */
-const APP_PUBLIC = new Set(['/app/sign-in']);
+const APP_PUBLIC = new Set([
+  '/app/sign-in',
+  '/app/forgot-password',
+  '/app/reset-password',
+  '/app/verify-email',
+  '/app/confirm-email',
+]);
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });

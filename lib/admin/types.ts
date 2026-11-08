@@ -135,6 +135,8 @@ export type Transaction = {
   status: TxnStatus;
   amount: number;
   reference: string | null;
+  settled_at?: string | null;
+  settled_by?: string | null;
   created_at: string;
 };
 
@@ -165,6 +167,7 @@ export type WalletSecurity = {
   pin_locked_until: string | null;
   bank_code: string | null;
   bank_name: string | null;
+  account_number: string | null;
   account_name: string | null;
   bank_verified_at: string | null;
   updated_at: string;
@@ -226,6 +229,11 @@ export type Database = {
       };
       admin_release_dispute: {
         Args: { p_job_id: string; p_note: string | null };
+        Returns: undefined;
+      };
+      /** supabase/withdrawal_settlement.sql. A failed withdrawal refunds the wallet. */
+      admin_settle_withdrawal: {
+        Args: { p_txn_id: string; p_paid: boolean; p_admin: string; p_reference: string | null };
         Returns: undefined;
       };
     };

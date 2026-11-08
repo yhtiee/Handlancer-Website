@@ -203,6 +203,15 @@ export type Dispute = {
   created_at: string;
 };
 
+/** Web addition (supabase/email_delivery.sql). No row means everything is on. */
+export type EmailPreferences = {
+  user_id: string;
+  job_alerts: boolean;
+  messages: boolean;
+  activity: boolean;
+  updated_at?: string;
+};
+
 type Table<Row, Insert = Partial<Row>, Update = Partial<Row>> = {
   Row: Row;
   Insert: Insert;
@@ -225,6 +234,7 @@ export type Database = {
       job_media: Table<JobMedia>;
       notifications: Table<Notification>;
       disputes: Table<Dispute>;
+      email_preferences: Table<EmailPreferences>;
     };
     Views: Record<string, never>;
     Functions: {

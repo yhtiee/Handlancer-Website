@@ -38,9 +38,22 @@ export async function listTransactions({ page, q, status, type }: TransactionLis
   const ownerByWallet = new Map((wallets ?? []).map((w) => [w.id, w.owner_id]));
   const people = await profilesById([...ownerByWallet.values()]);
 
+  // Where to send the money, and only while it still has to be sent.
+  const awaitingPayout = (data ?? []).filter((t) => t.type === 'withdraw' && t.status === 'pending');
+  const payoutOwners = [...new Set(awaitingPayout.map((t) => ownerByWallet.get(t.wallet_id)).filter((id): id is string => !!id))];
+  const { data: banks } = payoutOwners.length
+    ? await db.from('wallet_security').select('user_id, bank_name, account_name, account_number').in('user_id', payoutOwners)
+    : { data: [] as { user_id: string; bank_name: string | null; account_name: string | null; account_number: string | null }[] };
+  const bankByOwner = new Map((banks ?? []).map((b) => [b.user_id, b]));
+
   const rows = (data ?? []).map((t) => {
     const ownerId = ownerByWallet.get(t.wallet_id);
-    return { ...t, owner: ownerId ? (people.get(ownerId) ?? null) : null };
+    const awaiting = t.type === 'withdraw' && t.status === 'pending';
+    return {
+      ...t,
+      owner: ownerId ? (people.get(ownerId) ?? null) : null,
+      payout: awaiting && ownerId ? (bankByOwner.get(ownerId) ?? null) : null,
+    };
   });
   return paged(rows, count, range.page);
 }

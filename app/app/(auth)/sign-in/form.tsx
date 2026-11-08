@@ -5,6 +5,8 @@
  * validation and the same routing after — a new account picks a role next, an
  * existing one goes straight home.
  */
+import type { AuthError } from '@supabase/supabase-js';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -13,21 +15,16 @@ import { Segmented } from '@/components/app/controls';
 import { PasswordInput } from '@/components/app/password-input';
 import { useAuth } from '@/lib/app/auth';
 import { mustApply } from '@/lib/app/domain/artisan-status';
-import { routes } from '@/lib/app/domain/routes';
+import { routes, safeNext } from '@/lib/app/domain/routes';
 import { getProfileById, signInWithEmail, signUpWithEmail } from '@/lib/app/services/auth';
 
 type Mode = 'signin' | 'signup';
-
-/** Only same-app paths: `next` must never bounce someone off-site. */
-function safeNext(next: string | null) {
-  return next && next.startsWith('/app') && !next.startsWith('//') ? next : routes.home;
-}
 
 export function SignInForm() {
   const router = useRouter();
   const params = useSearchParams();
   const role = params.get('role');
-  const next = safeNext(params.get('next'));
+  const next = safeNext(params.get('next'), routes.home);
   const { loading: authLoading, session, profile } = useAuth();
 
   // Arriving with a role means they are new here; a plain visit is a sign-in.
@@ -48,6 +45,12 @@ export function SignInForm() {
   }, [authLoading, session, profile, loading, next, router]);
 
   const onboarding = role ? `${routes.onboarding}?role=${role}` : routes.onboarding;
+
+  function goVerify() {
+    const query = new URLSearchParams({ email: email.trim() });
+    if (role) query.set('role', role);
+    router.push(`${routes.verifyEmail}?${query}`);
+  }
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -82,13 +85,22 @@ export function SignInForm() {
     setLoading(true);
     try {
       if (mode === 'signup') {
-        const { session: created } = await signUpWithEmail(email, password);
-        if (!created) {
-          setNotice('Account created. Check your inbox to confirm your email, then sign in here.');
-          setMode('signin');
+        const { session: created, user } = await signUpWithEmail(email, password, onboarding);
+        if (created) {
+          router.replace(onboarding);
           return;
         }
-        router.replace(onboarding);
+        // With confirmation on, Auth answers an already-registered address with
+        // a placeholder user and sends nothing; waiting for a code would be a dead end.
+        if (user && user.identities?.length === 0) {
+          setNotice('That email already has an account. Sign in, or reset your password if you’ve forgotten it.');
+          setMode('signin');
+          setConfirm('');
+          setPassword('');
+          setLoading(false);
+          return;
+        }
+        goVerify();
       } else {
         const { user } = await signInWithEmail(email, password);
         const existing = await getProfileById(user.id);
@@ -96,6 +108,10 @@ export function SignInForm() {
         router.replace(!existing ? onboarding : mustApply(existing) ? routes.apply : next);
       }
     } catch (e) {
+      if ((e as AuthError).code === 'email_not_confirmed') {
+        goVerify();
+        return;
+      }
       setError(e instanceof Error ? e.message : 'Something went wrong. Try again.');
       setLoading(false);
     }
@@ -174,6 +190,11 @@ export function SignInForm() {
             invalid={!!passwordError}
           />
         </Field>
+        {mode === 'signin' && (
+          <Link href={routes.forgotPassword} className="-mt-2 self-start text-[14px] font-semibold text-[var(--navy)] hover:underline">
+            Forgot your password?
+          </Link>
+        )}
         {mode === 'signup' && (
           <Field label="Confirm password" htmlFor="confirm" error={confirmError}>
             <PasswordInput

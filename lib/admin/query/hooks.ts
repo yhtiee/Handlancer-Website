@@ -11,7 +11,7 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
-import { resolveDispute, reviewArtisan, signIn, signOut, type ActionResult, type ResolveInput, type ReviewArtisanInput } from '@/app/admin/actions';
+import { resolveDispute, reviewArtisan, settleWithdrawal, signIn, signOut, type ActionResult, type ResolveInput, type ReviewArtisanInput, type SettleWithdrawalInput } from '@/app/admin/actions';
 import { parseRangeParams, rangeToSearch, type RangeParams } from '@/lib/admin/analytics/range';
 import type { AnalyticsReport } from '@/lib/admin/analytics/types';
 import type { getArtisan, listArtisans } from '@/lib/admin/data/artisans';
@@ -257,6 +257,14 @@ export function useResolveDispute() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: ResolveInput) => unwrap(resolveDispute(input)),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.all }),
+  });
+}
+
+export function useSettleWithdrawal() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: SettleWithdrawalInput) => unwrap(settleWithdrawal(input)),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.all }),
   });
 }

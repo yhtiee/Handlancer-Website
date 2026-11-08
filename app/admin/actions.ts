@@ -112,6 +112,34 @@ export async function resolveDispute(input: ResolveInput): Promise<ActionResult>
   return { ok: true };
 }
 
+// ─────────────────────────── Withdrawals ───────────────────────────
+
+export type SettleWithdrawalInput = {
+  transactionId: string;
+  outcome: 'paid' | 'failed';
+  /** The bank's reference for the transfer, when there is one. */
+  reference?: string;
+};
+
+/**
+ * Record the result of a payout made by hand. Marking one failed puts the money
+ * back in the wallet; the function does both in one transaction. The status
+ * change is what emails the customer.
+ */
+export async function settleWithdrawal(input: SettleWithdrawalInput): Promise<ActionResult> {
+  const admin = await requireAdmin();
+  if (input.outcome !== 'paid' && input.outcome !== 'failed') return { ok: false, error: 'Choose an outcome.' };
+
+  const { error } = await serviceClient().rpc('admin_settle_withdrawal', {
+    p_txn_id: input.transactionId,
+    p_paid: input.outcome === 'paid',
+    p_admin: admin.userId,
+    p_reference: input.reference?.trim() || null,
+  });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
 // ─────────────────────────── Artisan review ───────────────────────────
 
 export type ArtisanDecision = 'approve' | 'request_changes' | 'suspend';

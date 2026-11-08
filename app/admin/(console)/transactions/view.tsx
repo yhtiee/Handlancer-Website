@@ -3,6 +3,7 @@
 import Link from 'next/link';
 
 import { ListView } from '@/components/admin/list-view';
+import { SettleWithdrawal } from '@/components/admin/settle-withdrawal';
 import { StatusBadge } from '@/components/admin/ui';
 import { formatDateTime, formatNaira, humanize } from '@/lib/admin/format';
 import { useTransactions, useListFilters } from '@/lib/admin/query/hooks';
@@ -84,6 +85,15 @@ export function TransactionsView() {
           align: 'right',
           hideBelow: 'sm',
           cell: (t) => <span className="text-[var(--muted)]">{formatDateTime(t.created_at)}</span>,
+        },
+        {
+          key: 'settle',
+          header: '',
+          align: 'right',
+          cell: (t) =>
+            t.type === 'withdraw' && t.status === 'pending' ? (
+              <SettleWithdrawal transactionId={t.id} amount={t.amount} who={t.owner?.name ?? t.owner?.email ?? 'Unnamed account'} payout={t.payout} />
+            ) : null,
         },
       ]}
     />
