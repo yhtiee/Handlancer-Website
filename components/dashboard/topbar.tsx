@@ -145,8 +145,11 @@ export function Popover({
         <div
           role="region"
           aria-label={label}
-          className="absolute right-0 top-full z-50 mt-2 max-w-[calc(100vw-24px)] overflow-hidden rounded-md border border-[var(--rule-strong)] bg-[var(--paper)]"
-          style={{ width }}
+          // Below lg other controls sit right of the bell, so aligning to it would
+          // push a near-full-width panel off the left edge. Pin to the screen's
+          // edge instead; with no `top`, it stays directly under the button.
+          className="absolute right-0 top-full z-50 mt-2 overflow-hidden rounded-md border border-[var(--rule-strong)] bg-[var(--paper)] max-lg:fixed max-lg:right-3 max-lg:top-auto"
+          style={{ width: `min(${width}px, calc(100vw - 24px))` }}
         >
           {children(() => setOpen(false))}
         </div>

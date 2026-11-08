@@ -124,7 +124,7 @@ export function AppBell() {
           ) : latest.length === 0 ? (
             <p className="px-4 py-8 text-center text-[14px] text-[var(--muted)]">Quotes, hires, messages and payments will show up here.</p>
           ) : (
-            <ul className="max-h-[360px] divide-y divide-[var(--rule)] overflow-y-auto">
+            <ul className="max-h-[min(360px,55dvh)] divide-y divide-[var(--rule)] overflow-y-auto">
               {latest.map((n) => {
                 const { icon, title, body } = describeNotification(n.type, (n.payload ?? {}) as Record<string, unknown>);
                 return (
