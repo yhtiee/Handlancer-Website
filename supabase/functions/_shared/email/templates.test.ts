@@ -42,6 +42,14 @@ test('the waitlist email carries nothing the submitter typed', () => {
   assert.ok(!(html + text).includes('BUY CRYPTO'));
 });
 
+test('a waitlist invitation links to onboarding for that role', () => {
+  const artisan = productEmail({ event: 'waitlist_invite', appUrl, data: { role: 'provider' } })!;
+  assert.equal(artisan.cta!.url, `${appUrl}/app/sign-in?role=provider`);
+  const customer = productEmail({ event: 'waitlist_invite', appUrl, data: { role: 'user' } })!;
+  assert.equal(customer.cta!.url, `${appUrl}/app/sign-in?role=user`);
+  assert.notEqual(artisan.subject, customer.subject);
+});
+
 test('a provider dispute email leaves out the allegation', () => {
   const { html } = render(productEmail({ event: 'dispute_opened', appUrl, data: { title: 'Job', reference: 'HL-1', reason: 'he stole it' } })!, appUrl);
   assert.ok(!html.includes('he stole it'));

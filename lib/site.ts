@@ -245,7 +245,7 @@ export type Faq = { q: string; a: string };
 export const FAQS: Faq[] = [
   {
     q: 'Is HandLancer available yet?',
-    a: 'For artisans, yes — you can join today in your browser at handlancer.com/app, with nothing to download, and every application is reviewed by a person before it goes live. For customers, not yet: we are opening city by city once there are approved artisans to hire. Join the customer waitlist and we will email you the moment your city opens.',
+    a: 'Yes. You can join today in your browser at handlancer.com/app, with nothing to download. Customers can create an account, post a job and compare quotes from artisans nearby. Artisans build a profile and apply, and every application is reviewed by a person before it goes live. We are growing city by city, starting with Uyo, so the number of artisans available depends on where you are.',
   },
   {
     q: 'How do I join HandLancer as an artisan?',

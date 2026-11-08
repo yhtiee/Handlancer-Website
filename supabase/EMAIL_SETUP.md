@@ -22,6 +22,7 @@ To change wording, edit `templates.ts`, run `npm test`, and redeploy both functi
 | Email change, invite, magic link, reauthentication | Handled for completeness; the app has no screen for these yet | User | Auth hook |
 | Profile created | Welcome (customer or artisan version) | User | `profiles` insert |
 | Waitlist | You're on the list | Submitted address | `waitlist` insert |
+| Waitlist invitation | HandLancer is live, with a sign-up link for that role. Skips anyone already invited or with an account | Waitlist, one role at a time | Admin → Waitlist button |
 | Artisan submits | Application received | Artisan | `provider_status` to pending |
 | Artisan submits | Application to review | Support | `provider_status` to pending |
 | Artisan reviewed | Approved, changes needed, suspended | Artisan | `notifications` |

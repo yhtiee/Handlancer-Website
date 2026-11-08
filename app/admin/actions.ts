@@ -140,6 +140,16 @@ export async function settleWithdrawal(input: SettleWithdrawalInput): Promise<Ac
   return { ok: true };
 }
 
+// ─────────────────────────── Waitlist ───────────────────────────
+
+/** Tell one role's waitlist that HandLancer is live. Returns how many were picked. */
+export async function sendWaitlistInvites(input: { role: 'user' | 'provider' }): Promise<ActionResult<{ count: number }>> {
+  await requireAdmin();
+  const { data, error } = await serviceClient().rpc('admin_send_waitlist_invites', { p_role: input.role });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true, count: data ?? 0 };
+}
+
 // ─────────────────────────── Artisan review ───────────────────────────
 
 export type ArtisanDecision = 'approve' | 'request_changes' | 'suspend';

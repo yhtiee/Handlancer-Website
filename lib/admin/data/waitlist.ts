@@ -22,7 +22,10 @@ export async function listWaitlist({ page, q, role }: WaitlistListParams) {
   const term = searchTerm(q);
   if (term) query = query.or(`name.ilike.%${term}%,email.ilike.%${term}%,city.ilike.%${term}%`);
 
-  const { data, count, error } = await query;
+  const [{ data, count, error }, invites] = await Promise.all([query, serviceClient().rpc('waitlist_invite_counts')]);
   if (error) throw error;
-  return paged(data, count, range.page);
+
+  // Null hides the invite buttons, rather than breaking the list, if the counts can't be read.
+  const toInvite = invites.error ? null : Object.fromEntries((invites.data ?? []).map((c) => [c.role, Number(c.n)]));
+  return { ...paged(data, count, range.page), toInvite };
 }

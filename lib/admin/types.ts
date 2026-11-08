@@ -183,6 +183,7 @@ export type WaitlistEntry = {
   category: string;
   years_experience: number | null;
   referral: string | null;
+  invited_at?: string | null;
   created_at: string;
 };
 
@@ -230,6 +231,16 @@ export type Database = {
       admin_release_dispute: {
         Args: { p_job_id: string; p_note: string | null };
         Returns: undefined;
+      };
+      /** supabase/waitlist_invites.sql. Everyone a click on each role's button would reach. */
+      waitlist_invite_counts: {
+        Args: Record<string, never>;
+        Returns: { role: string; n: number }[];
+      };
+      /** Returns how many people were picked; they are marked invited as they are picked. */
+      admin_send_waitlist_invites: {
+        Args: { p_role: string };
+        Returns: number;
       };
       /** supabase/withdrawal_settlement.sql. A failed withdrawal refunds the wallet. */
       admin_settle_withdrawal: {

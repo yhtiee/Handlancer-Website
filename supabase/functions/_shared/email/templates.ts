@@ -271,6 +271,31 @@ export function productEmail({ event, appUrl, name, data }: ProductInput): Email
         cta: data.role === 'provider' ? { label: 'Apply as an artisan', url: `${appUrl}/app/sign-in?role=provider` } : undefined,
         footnote: 'You’re getting this because this address joined the HandLancer waitlist. If that wasn’t you, ignore this email.',
       };
+    case 'waitlist_invite': {
+      // Like waitlist_joined, carries nothing the submitter typed.
+      const artisan = data.role === 'provider';
+      return {
+        subject: artisan ? 'HandLancer is live. Apply as an artisan' : 'HandLancer is live. Post your first job',
+        preheader: artisan ? 'Set up your profile and send it for review.' : 'Create your account and compare quotes from artisans near you.',
+        tag: 'You’re invited',
+        heading: 'HandLancer is',
+        emphasis: 'live',
+        blocks: artisan
+          ? [
+              { kind: 'p', text: 'You joined our waitlist as an artisan, and you can now set up your profile. Add your photo, phone number, area, trades and some photos of work you’ve done, then send it for review.' },
+              { kind: 'p', text: 'A person reviews every application. Once you’re approved, customers can find you and you can quote on open jobs. Joining is free and HandLancer takes no commission.' },
+            ]
+          : [
+              { kind: 'p', text: 'You joined our waitlist, and you can now create your account. Post a job and compare itemised quotes from artisans near you.' },
+              { kind: 'p', text: 'When you hire someone, your money waits in escrow, and you release each payment only when the work is done.' },
+            ],
+        cta: artisan
+          ? { label: 'Start my application', url: `${appUrl}/app/sign-in?role=provider` }
+          : { label: 'Create my account', url: `${appUrl}/app/sign-in?role=user` },
+        showLink: true,
+        footnote: 'You’re getting this because this address joined the HandLancer waitlist.',
+      };
+    }
 
     // ── Artisan review ──
     case 'artisan_application_received':
@@ -680,6 +705,7 @@ export function productEmail({ event, appUrl, name, data }: ProductInput): Email
 export const PRODUCT_EVENTS = [
   'welcome',
   'waitlist_joined',
+  'waitlist_invite',
   'artisan_application_received',
   'artisan_approved',
   'artisan_changes_requested',

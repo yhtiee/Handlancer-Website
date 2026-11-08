@@ -2,6 +2,7 @@
 
 import { ListView } from '@/components/admin/list-view';
 import { StatusBadge } from '@/components/admin/ui';
+import { WaitlistInvites } from '@/components/admin/waitlist-invites';
 import { formatDate } from '@/lib/admin/format';
 import { useWaitlist, useListFilters } from '@/lib/admin/query/hooks';
 import { CATEGORIES } from '@/lib/site';
@@ -10,9 +11,12 @@ const CATEGORY_NAME = new Map<string, string>(CATEGORIES.map((c) => [c.id, c.lab
 
 export function WaitlistView() {
   const { filters } = useListFilters();
+  const query = useWaitlist(filters);
   return (
+    <>
+    {query.data?.toInvite && <WaitlistInvites counts={query.data.toInvite} />}
     <ListView
-      query={useWaitlist(filters)}
+      query={query}
       toolbar={{
         paramKey: 'role',
         searchPlaceholder: 'Search name, email, city',
@@ -62,7 +66,15 @@ export function WaitlistView() {
           hideBelow: 'sm',
           cell: (w) => <span className="text-[var(--muted)]">{formatDate(w.created_at)}</span>,
         },
+        {
+          key: 'invited',
+          header: 'Invited',
+          align: 'right',
+          hideBelow: 'sm',
+          cell: (w) => <span className="text-[var(--muted)]">{w.invited_at ? formatDate(w.invited_at) : '—'}</span>,
+        },
       ]}
     />
+    </>
   );
 }

@@ -34,6 +34,8 @@ const OPTIONAL: Record<string, 'messages' | 'activity'> = {
   review: 'activity',
 };
 
+declare const EdgeRuntime: { waitUntil(promise: Promise<unknown>): void };
+
 const admin = createClient(Deno.env.get('SUPABASE_URL')!, Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!);
 
 type Row = {
@@ -131,6 +133,35 @@ async function sendJobAlerts(jobId: string): Promise<Response> {
   return finish(200, `sent to ${due.length}`);
 }
 
+type WaitlistRecipient = { id: string; email: string };
+
+/**
+ * One invitation per person, in Resend-sized batches. The database has already
+ * marked everyone invited; a batch Resend refuses is unmarked, so it goes back
+ * into the count and the next click retries it.
+ */
+async function sendWaitlistInvites(role: string, recipients: WaitlistRecipient[]) {
+  const event = 'waitlist_invite';
+  const rendered = render(productEmail({ event, appUrl: SITE_URL, data: { role } })!, SITE_URL);
+
+  for (let i = 0; i < recipients.length; i += BATCH_SIZE) {
+    const chunk = recipients.slice(i, i + BATCH_SIZE);
+    const sent = await sendBatch(chunk.map((r) => r.email), rendered, event);
+    if (!sent.ok) {
+      const { error } = await admin.from('waitlist').update({ invited_at: null }).in('id', chunk.map((r) => r.id));
+      if (error) console.error('[email] could not unmark waitlist batch', error.message);
+    }
+    await record({
+      user_id: null,
+      event,
+      dedupe_key: role,
+      status: sent.ok ? 'sent' : 'failed',
+      detail: sent.ok ? `${chunk.length} sent` : `${chunk.length} not sent, ${sent.status}: ${sent.detail}`,
+    });
+    if (i + BATCH_SIZE < recipients.length) await new Promise((r) => setTimeout(r, 600));
+  }
+}
+
 /** No row means every optional email is on. */
 async function optedOut(event: string, userId: string | null): Promise<boolean> {
   const column = OPTIONAL[event];
@@ -156,6 +187,11 @@ Deno.serve(async (req) => {
 
   try {
     if (event === 'job_posted') return await sendJobAlerts(String(data.job_id ?? ''));
+    if (event === 'waitlist_invite_batch') {
+      // Answered straight away: pg_net gives up after 10s, and a long list takes longer.
+      EdgeRuntime.waitUntil(sendWaitlistInvites(String(data.role), (data.recipients ?? []) as WaitlistRecipient[]));
+      return new Response('accepted', { status: 202 });
+    }
 
     const dedupeKey = event === 'message' ? String(data.conversation_id ?? '') + ':' + String(userId) : null;
     const skip = async (detail: string) => {
