@@ -257,7 +257,7 @@ function YouStep({ profile, onDone }: { profile: Profile; onDone: () => void }) 
   function submit(e: React.FormEvent) {
     e.preventDefault();
     const next: Record<string, string> = {};
-    if (!avatar) next.avatar = 'Add a clear photo of yourself.';
+    if (!avatar) next.avatar = 'Add a clear photo of yourself or your logo.';
     if (!name.trim()) next.name = 'Enter your full name.';
     if (phone.replace(/\D/g, '').length < 10) next.phone = 'Enter a phone number we can call.';
     if (!location.trim()) next.location = 'Tell us the area you work in.';
@@ -268,18 +268,18 @@ function YouStep({ profile, onDone }: { profile: Profile; onDone: () => void }) 
 
   return (
     <form onSubmit={submit} noValidate>
-      <StepHead n={0} title={<>Who customers <em>will meet</em></>} lede="Your name, face and number. A real photo is the first thing customers — and our reviewers — look for." />
+      <StepHead n={0} title={<>Who customers <em>will meet</em></>} lede="Your name, picture and number. A clear photo or logo is the first thing customers — and our reviewers — look for." />
       <div className="card space-y-6 p-5 md:p-6">
         <div>
           <div className="flex items-center gap-4">
             <Avatar src={avatar} name={name || profile.name} size={80} />
             <div className="space-y-1.5">
               <label className={`btn btn-ghost !h-10 cursor-pointer ${uploading ? 'pointer-events-none opacity-60' : ''}`}>
-                <input type="file" accept="image/*" capture="user" className="sr-only" onChange={(e) => void pickPhoto(e.target.files?.[0])} />
+                <input type="file" accept="image/*" className="sr-only" onChange={(e) => void pickPhoto(e.target.files?.[0])} />
                 {uploading ? <span className="spinner" aria-hidden="true" /> : <Icon name="camera" size={18} />}
-                {avatar ? 'Change photo' : 'Add your photo'}
+                {avatar ? 'Change photo' : 'Add photo or logo'}
               </label>
-              <p className="text-[13px] text-[var(--muted)]">Your face, in good light. Not a logo.</p>
+              <p className="text-[13px] text-[var(--muted)]">Your face in good light, or your business logo.</p>
             </div>
           </div>
           {errors.avatar && <p className="mt-2 text-[13.5px] text-[var(--bad)]">{errors.avatar}</p>}
@@ -569,7 +569,7 @@ function RulesStep({ profile, onBack }: { profile: Profile; onBack: () => void }
 
       <div className="mt-6">
         <Note icon="information-circle">
-          <b className="text-[var(--ink)]">What happens next:</b> a person at HandLancer reviews your application. We check for {REVIEW_CRITERIA.length} things — a clear photo, a reachable phone, your area and trades, real work photos and an honest description — and may call you. You’ll get a notification either way.
+          <b className="text-[var(--ink)]">What happens next:</b> a person at HandLancer reviews your application. We check for {REVIEW_CRITERIA.length} things — a clear photo or logo, a reachable phone, your area and trades, real work photos and an honest description — and may call you. You’ll get a notification either way.
         </Note>
       </div>
 

@@ -17,7 +17,7 @@ const ALERT = 'rounded-md border border-[var(--bad)]/40 bg-[var(--bad)]/[.06] px
 /** Mirrors REVIEW_CRITERIA in lib/artisan-program.ts — what the artisan was told we check. */
 function checklist(p: Profile) {
   return [
-    { label: 'Clear photo of the person', ok: !!p.avatar_url, hint: 'Check it is a face, not a logo.' },
+    { label: 'Clear photo or business logo', ok: !!p.avatar_url, hint: 'Check it is a real face or logo, and legible.' },
     { label: 'Reachable phone number', ok: (p.phone ?? '').replace(/\D/g, '').length >= 10, hint: 'Call to confirm if anything looks off.' },
     { label: 'Area and trades', ok: !!p.location?.trim() && !!p.services?.length, hint: 'Do the trades match the work photos?' },
     { label: 'Photos of real work', ok: (p.work_photos?.length ?? 0) > 0, hint: 'Watch for stock or copied photos.' },

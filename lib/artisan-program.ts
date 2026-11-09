@@ -65,7 +65,7 @@ export const ARTISAN_RULES: ArtisanRule[] = [
 
 /** What a reviewer checks before approving an application. */
 export const REVIEW_CRITERIA: string[] = [
-  'A clear photo of you — your face, not a logo.',
+  'A clear photo of you, or your business logo.',
   'A phone number we can reach you on.',
   'The area you work in, and the trades you actually do.',
   'Photos of real work you have done.',
@@ -75,7 +75,7 @@ export const REVIEW_CRITERIA: string[] = [
 /** Joining, start to first job. Mirrors the steps of the in-app application. */
 export const JOIN_STEPS: [string, string][] = [
   ['Create your account', 'Email and a password. Choose “I do the work”.'],
-  ['Build your profile', 'Your photo, phone, area, trades, experience and a few photos of past work. Saved as you go.'],
+  ['Build your profile', 'Your photo or logo, phone, area, trades, experience and a few photos of past work. Saved as you go.'],
   ['Accept the artisan rules', 'The rules below — the same ones you see here.'],
   ['Get reviewed', 'A person at HandLancer checks your application and may call you. You are notified in the app either way.'],
   ['Start quoting', 'Once approved, customers can find you and you can quote on open jobs near you.'],
@@ -97,7 +97,7 @@ export const ARTISAN_FAQS: { q: string; a: string }[] = [
   },
   {
     q: 'How long does the review take, and what do you check?',
-    a: 'Applications are reviewed by a person, in the order they arrive. We look for a clear photo of you, a phone number we can reach, your area and trades, photos of real work you have done, and an honest description of your experience. We may call you, and you are notified in the app either way.',
+    a: 'Applications are reviewed by a person, in the order they arrive. We look for a clear photo of you or your business logo, a phone number we can reach, your area and trades, photos of real work you have done, and an honest description of your experience. We may call you, and you are notified in the app either way.',
   },
   {
     q: 'What if my application is sent back?',
