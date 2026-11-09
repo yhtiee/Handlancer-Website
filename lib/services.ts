@@ -1300,7 +1300,14 @@ export const SERVICES: Service[] = [
     label: 'Private chef & event catering',
     category: 'other',
     blurb: 'Meal preparation, weekly cooking and catering for events.',
-    aliases: ['caterer', 'cook'],
+    aliases: ['caterer', 'cooking', 'meal prep'],
+  },
+  {
+    slug: 'baking-pastries',
+    label: 'Baking & pastries',
+    category: 'other',
+    blurb: 'Made-to-order cakes, pastries and small chops for birthdays, weddings and events.',
+    aliases: ['cake baker', 'pastry chef', 'small chops'],
   },
   {
     slug: 'driver-hire',
@@ -1315,6 +1322,13 @@ export const SERVICES: Service[] = [
     category: 'other',
     blurb: 'Canopies, chairs, staging, decoration and event breakdown.',
     aliases: ['event decoration', 'canopy rental'],
+  },
+  {
+    slug: 'gaming-setup-events',
+    label: 'Gaming setup & console rental for events',
+    category: 'other',
+    blurb: 'PS5s, screens and gaming stations delivered, set up and collected by the provider for parties and events.',
+    aliases: ['PS5 rental', 'console hire', 'game station'],
   },
   {
     slug: 'photography-videography',
