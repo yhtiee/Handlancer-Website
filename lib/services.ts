@@ -1366,6 +1366,13 @@ export const SERVICES: Service[] = [
     aliases: ['curtain rail', 'window blinds'],
   },
   {
+    slug: 'interior-design',
+    label: 'Interior design',
+    category: 'other',
+    blurb: 'Room layouts, colour and finish schemes, furniture selection and full home or office styling.',
+    aliases: ['interior decorator', 'home styling', 'interior decoration'],
+  },
+  {
     slug: 'solar-water-heater',
     label: 'Solar water heater',
     category: 'other',
