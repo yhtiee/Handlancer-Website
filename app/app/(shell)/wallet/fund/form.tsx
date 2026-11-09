@@ -15,6 +15,7 @@ import { useState } from 'react';
 import { Icon } from '@/components/app/icon';
 import { useOnline } from '@/components/app/pwa';
 import { Button, ButtonLink, Field, Note, PageHeader, Section } from '@/components/app/ui';
+import { topUpCharge } from '@/lib/app/domain/fees';
 import { formatMoney } from '@/lib/app/domain/money';
 import { routes } from '@/lib/app/domain/routes';
 import { useInitTopUp, useRefreshWallet, useWallet } from '@/lib/app/queries/use-wallet';
@@ -31,6 +32,7 @@ export function FundForm() {
   const [waitingFrom, setWaitingFrom] = useState<number | null>(null);
 
   const value = Number(amount.replace(/[^0-9]/g, ''));
+  const charge = value >= 100 ? topUpCharge(value) : null;
   const balance = wallet?.balance ?? 0;
   const arrived = waitingFrom != null && balance > waitingFrom;
 
@@ -71,7 +73,7 @@ export function FundForm() {
             </p>
           ) : (
             <p className="text-[15px] text-[var(--muted)]">
-              Pay <b className="figure text-[var(--ink)]">{formatMoney(value)}</b> with Flutterwave in the tab that just opened. This page updates by itself when the money lands — usually within a minute.
+              Pay <b className="figure text-[var(--ink)]">{formatMoney(charge ?? value)}</b> with Flutterwave in the tab that just opened. This page updates by itself when the money lands — usually within a minute.
             </p>
           )}
           <div className="flex flex-col justify-center gap-2 sm:flex-row">
@@ -132,6 +134,22 @@ export function FundForm() {
               </div>
             </Field>
           </div>
+          {charge != null && (
+            <dl className="mt-4 divide-y divide-[var(--rule)] rounded-md bg-[var(--band)] px-3.5 text-[14px]">
+              <div className="flex justify-between gap-4 py-2.5">
+                <dt className="text-[var(--muted)]">Added to your wallet</dt>
+                <dd className="figure text-[var(--ink)]">{formatMoney(value)}</dd>
+              </div>
+              <div className="flex justify-between gap-4 py-2.5">
+                <dt className="text-[var(--muted)]">Flutterwave fee</dt>
+                <dd className="figure text-[var(--ink)]">{formatMoney(charge - value)}</dd>
+              </div>
+              <div className="flex justify-between gap-4 py-2.5 font-semibold">
+                <dt className="text-[var(--ink)]">You pay</dt>
+                <dd className="figure text-[var(--ink)]">{formatMoney(charge)}</dd>
+              </div>
+            </dl>
+          )}
         </Section>
         <Note icon="lock-closed">You’ll finish paying on Flutterwave’s secure page in a new tab. HandLancer never sees your card details.</Note>
         <div className="flex justify-end">

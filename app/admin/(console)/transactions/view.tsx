@@ -92,7 +92,7 @@ export function TransactionsView() {
           align: 'right',
           cell: (t) =>
             t.type === 'withdraw' && t.status === 'pending' ? (
-              <SettleWithdrawal transactionId={t.id} amount={t.amount} who={t.owner?.name ?? t.owner?.email ?? 'Unnamed account'} payout={t.payout} />
+              <SettleWithdrawal transactionId={t.id} amount={t.amount} who={t.owner?.name ?? t.owner?.email ?? 'Unnamed account'} payout={t.payout} state={t.payout_state} note={t.payout_note} reference={t.reference} />
             ) : null,
         },
       ]}

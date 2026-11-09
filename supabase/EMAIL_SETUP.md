@@ -46,6 +46,7 @@ To change wording, edit `templates.ts`, run `npm test`, and redeploy both functi
 | Wallet | Withdrawal requested, paid, failed | Owner | `withdraw` transaction |
 | Security | PIN set or changed, wallet locked, payout account changed | Owner | `wallet_security` |
 | Forgot PIN | One-time reset code, 15 minutes | Owner | `request_pin_reset()` in `pin_reset.sql` |
+| Payout stuck | A withdrawal Flutterwave refused or didn't answer | Support | `mark_withdrawal_payout()` in `withdrawal_payout.sql` |
 | Account deleted | Confirmation | Former owner | `profiles.deleted_at` |
 
 People can turn off job alerts, messages, and quote and review emails in Settings

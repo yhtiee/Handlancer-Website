@@ -10,7 +10,7 @@ import { PageHeader } from '@/components/page-header';
 import { LegalBody, type LegalSection } from '@/components/legal';
 
 const PATH = '/terms';
-const EFFECTIVE = '2026-10-08';
+const EFFECTIVE = '2026-11-09';
 
 const trail = [
   { name: 'Home', path: '/' },
@@ -87,7 +87,7 @@ const SECTIONS: LegalSection[] = [
     heading: 'Wallet and payments',
     id: 'wallet',
     paragraphs: [
-      'Your HandLancer wallet holds Naira for paying for and receiving payment for jobs on the platform. You top it up through Flutterwave, our payment processor, and Flutterwave’s own terms also apply to those payments. The wallet is not a bank account and earns no interest.',
+      'Your HandLancer wallet holds Naira for paying for and receiving payment for jobs on the platform. You top it up through Flutterwave, our payment processor, and Flutterwave’s own terms also apply to those payments. The wallet is not a bank account and earns no interest. Flutterwave’s processing fee is added when you top up, and its transfer fee is taken from each withdrawal. We show you both before you confirm.',
       'Withdrawals go only to a Nigerian bank account in your name that we have verified, and each one needs your transfer PIN. The PIN locks after repeated wrong attempts. We may delay, hold or reverse a payment, or ask you for more information, where we reasonably suspect fraud, an error, or a breach of these terms, or where the law requires it.',
       'If money reaches your wallet by mistake, it is not yours, and we may reverse it.',
     ],

@@ -91,6 +91,12 @@ test('a PIN reset code is in the body but never the subject or preview', () => {
   assert.equal(email.manageUrl, undefined);
 });
 
+test('a paid withdrawal says what actually reached the bank', () => {
+  const email = productEmail({ event: 'withdrawal_paid', appUrl, data: { amount: 5000, fee: 10.75, received: 4989.25 } })!;
+  assert.match(email.subject, /₦4,989\.25/);
+  assert.match(render(email, appUrl).text, /Flutterwave fee/);
+});
+
 test('an open budget is not shown as zero naira', () => {
   const { text } = render(productEmail({ event: 'job_alert', appUrl, data: { job_id: jobId, title: 'x', budget: null } })!, appUrl);
   assert.match(text, /Budget: Open/);

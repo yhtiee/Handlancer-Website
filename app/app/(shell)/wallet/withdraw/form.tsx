@@ -14,6 +14,8 @@ import { Icon } from '@/components/app/icon';
 import { ForgotPinLink } from '@/components/app/pin-fields';
 import { useOnline } from '@/components/app/pwa';
 import { Button, ErrorNote, Field, Money, PageHeader, Section, Skeleton } from '@/components/app/ui';
+import { MIN_WITHDRAWAL, transferFee } from '@/lib/app/domain/fees';
+import { formatMoney } from '@/lib/app/domain/money';
 import { routes } from '@/lib/app/domain/routes';
 import { useRequestWithdrawal, useWallet } from '@/lib/app/queries/use-wallet';
 import { useWalletSecurity } from '@/lib/app/queries/use-wallet-security';
@@ -50,6 +52,9 @@ export function WithdrawForm() {
     let invalid = false;
     if (!value) {
       setAmountError('Enter an amount');
+      invalid = true;
+    } else if (value < MIN_WITHDRAWAL) {
+      setAmountError(`The smallest withdrawal is ${formatMoney(MIN_WITHDRAWAL)}`);
       invalid = true;
     } else if (value > balance) {
       setAmountError('Amount exceeds your balance');
@@ -136,6 +141,12 @@ export function WithdrawForm() {
                   </button>
                 )}
               </Field>
+              {value >= MIN_WITHDRAWAL && (
+                <p className="text-[14px] text-[var(--muted)]">
+                  Flutterwave’s transfer fee is about <b className="figure text-[var(--ink)]">{formatMoney(transferFee(value))}</b>, so about{' '}
+                  <b className="figure text-[var(--ink)]">{formatMoney(value - transferFee(value))}</b> reaches your bank.
+                </p>
+              )}
               <Field label="Transfer PIN" htmlFor="pin" error={pinError}>
                 <input
                   id="pin"

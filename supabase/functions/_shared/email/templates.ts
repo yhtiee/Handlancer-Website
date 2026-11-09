@@ -588,14 +588,22 @@ export function productEmail({ event, appUrl, name, data }: ProductInput): Email
       };
     case 'withdrawal_paid':
       return {
-        subject: `${naira(data.amount)} sent to your bank`,
+        subject: `${naira(data.received ?? data.amount)} sent to your bank`,
         preheader: 'Your withdrawal has been paid.',
         tag: 'Wallet',
         heading: 'Withdrawal',
         emphasis: 'paid',
         blocks: [
           { kind: 'p', text: 'Your withdrawal has been sent to your linked bank account.' },
-          { kind: 'rows', rows: [['Amount', naira(data.amount)], ...(data.reference ? [['Reference', text(data.reference)] as [string, string]] : [])] },
+          {
+            kind: 'rows',
+            rows: [
+              ...(data.received != null
+                ? ([['Withdrawn', naira(data.amount)], ['Flutterwave fee', naira(data.fee)], ['Sent to your bank', naira(data.received)]] as [string, string][])
+                : ([['Amount', naira(data.amount)]] as [string, string][])),
+              ...(data.reference ? [['Reference', text(data.reference)] as [string, string]] : []),
+            ],
+          },
         ],
         cta: { label: 'See my wallet', url: walletUrl },
       };
@@ -683,6 +691,20 @@ export function productEmail({ event, appUrl, name, data }: ProductInput): Email
       };
 
     // ── Support inbox ──
+    case 'admin_payout_problem':
+      return {
+        subject: `A ${naira(data.amount)} withdrawal needs attention`,
+        preheader: 'Flutterwave did not complete it.',
+        tag: 'Admin',
+        heading: 'Withdrawal needs',
+        emphasis: 'attention',
+        blocks: [
+          { kind: 'p', text: data.state === 'unknown' ? 'Flutterwave gave no clear answer, so this may have been paid. Check its dashboard before retrying.' : 'Flutterwave refused this withdrawal, so no money left. The customer’s money is still held as pending.' },
+          { kind: 'rows', rows: [['Amount', naira(data.amount)], ['Flutterwave said', text(data.note, 'Nothing')]] },
+        ],
+        cta: { label: 'Open withdrawals', url: `${appUrl}/admin/transactions?type=withdraw` },
+        footnote: 'Sent to the HandLancer support inbox.',
+      };
     case 'admin_artisan_submitted': {
       const id = idOrNull(data.artisan_id);
       return {
@@ -752,4 +774,5 @@ export const PRODUCT_EVENTS = [
   'account_deleted',
   'admin_artisan_submitted',
   'admin_dispute_opened',
+  'admin_payout_problem',
 ] as const;

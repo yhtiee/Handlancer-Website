@@ -138,6 +138,9 @@ export type Transaction = {
   status: TxnStatus;
   amount: number;
   reference: string | null;
+  /** Withdrawals: what Flutterwave charged, and what reached the bank. */
+  payout_fee?: number | null;
+  payout_amount?: number | null;
   created_at: string;
 };
 

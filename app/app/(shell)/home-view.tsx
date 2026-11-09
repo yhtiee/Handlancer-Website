@@ -86,7 +86,8 @@ function ClientHome() {
 
       <AttentionStrip title="Waiting on you" items={attention} />
 
-      <div className={`grid gap-6 ${active ? 'lg:grid-cols-[1.1fr_.9fr]' : ''}`}>
+      {/* grid-cols-1, not the default: an implicit column grows to fit one long unwrapped line. */}
+      <div className={`grid grid-cols-1 gap-6 ${active ? 'lg:grid-cols-[minmax(0,1.1fr)_minmax(0,.9fr)]' : ''}`}>
         {active && <LiveJob job={active} />}
         <div className="space-y-6">
           <QuotesWaiting jobs={open} />
@@ -284,7 +285,7 @@ function ProviderHome() {
         </Link>
       )}
 
-      <div className={`grid gap-6 ${underWay.length ? 'lg:grid-cols-[1.15fr_.85fr]' : ''}`}>
+      <div className={`grid grid-cols-1 gap-6 ${underWay.length ? 'lg:grid-cols-[minmax(0,1.15fr)_minmax(0,.85fr)]' : ''}`}>
         <Section title="New jobs for you" flush action={<Link href={routes.findWork} className="ulink text-[13.5px]">See all</Link>}>
           {feed.isLoading ? (
             <ListSkeleton rows={4} />

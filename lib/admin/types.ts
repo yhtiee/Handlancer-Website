@@ -138,8 +138,13 @@ export type Transaction = {
   reference: string | null;
   settled_at?: string | null;
   settled_by?: string | null;
+  payout_state?: PayoutState | null;
+  payout_note?: string | null;
   created_at: string;
 };
+
+/** Where a withdrawal is with Flutterwave. Null means nobody has tried yet. */
+export type PayoutState = 'sending' | 'submitted' | 'not_sent' | 'unknown';
 
 export type Dispute = {
   id: string;
@@ -246,6 +251,11 @@ export type Database = {
       /** supabase/withdrawal_settlement.sql. A failed withdrawal refunds the wallet. */
       admin_settle_withdrawal: {
         Args: { p_txn_id: string; p_paid: boolean; p_admin: string; p_reference: string | null };
+        Returns: undefined;
+      };
+      /** supabase/withdrawal_payout.sql. Hands a stuck withdrawal back to Flutterwave. */
+      admin_retry_withdrawal_payout: {
+        Args: { p_txn_id: string };
         Returns: undefined;
       };
     };

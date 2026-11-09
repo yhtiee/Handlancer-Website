@@ -11,7 +11,7 @@ import {
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useCallback, useMemo, useSyncExternalStore } from 'react';
 
-import { resolveDispute, reviewArtisan, sendWaitlistInvites, settleWithdrawal, signIn, signOut, type ActionResult, type ResolveInput, type ReviewArtisanInput, type SettleWithdrawalInput } from '@/app/admin/actions';
+import { resolveDispute, retryWithdrawalPayout, reviewArtisan, sendWaitlistInvites, settleWithdrawal, signIn, signOut, type ActionResult, type ResolveInput, type ReviewArtisanInput, type SettleWithdrawalInput } from '@/app/admin/actions';
 import { parseRangeParams, rangeToSearch, type RangeParams } from '@/lib/admin/analytics/range';
 import type { AnalyticsReport } from '@/lib/admin/analytics/types';
 import type { getArtisan, listArtisans } from '@/lib/admin/data/artisans';
@@ -273,6 +273,14 @@ export function useSettleWithdrawal() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (input: SettleWithdrawalInput) => unwrap(settleWithdrawal(input)),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.all }),
+  });
+}
+
+export function useRetryWithdrawalPayout() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { transactionId: string }) => unwrap(retryWithdrawalPayout(input)),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: adminKeys.all }),
   });
 }

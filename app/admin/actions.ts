@@ -140,6 +140,14 @@ export async function settleWithdrawal(input: SettleWithdrawalInput): Promise<Ac
   return { ok: true };
 }
 
+/** Try again through Flutterwave. The same reference means it can't be paid twice. */
+export async function retryWithdrawalPayout(input: { transactionId: string }): Promise<ActionResult> {
+  await requireAdmin();
+  const { error } = await serviceClient().rpc('admin_retry_withdrawal_payout', { p_txn_id: input.transactionId });
+  if (error) return { ok: false, error: error.message };
+  return { ok: true };
+}
+
 // ─────────────────────────── Waitlist ───────────────────────────
 
 /** Tell one role's waitlist that HandLancer is live. Returns how many were picked. */
