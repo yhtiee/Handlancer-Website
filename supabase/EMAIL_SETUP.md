@@ -23,6 +23,7 @@ To change wording, edit `templates.ts`, run `npm test`, and redeploy both functi
 | Profile created | Welcome (customer or artisan version) | User | `profiles` insert |
 | Waitlist | You're on the list | Submitted address | `waitlist` insert |
 | Waitlist invitation | HandLancer is live, with a sign-up link for that role. Skips anyone already invited or with an account | Waitlist, one role at a time | Admin → Waitlist button |
+| Application not sent | Benefits and a link to finish, at most three: a day after sign-up, 3 days later, 7 days later. Opt-out is on `/app/apply` | Artisans in draft | `pg_cron`, daily at 9am WAT (`profile_reminders.sql`) |
 | Artisan submits | Application received | Artisan | `provider_status` to pending |
 | Artisan submits | Application to review | Support | `provider_status` to pending |
 | Artisan reviewed | Approved, changes needed, suspended | Artisan | `notifications` |

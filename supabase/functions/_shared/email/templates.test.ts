@@ -19,6 +19,15 @@ test('every product event renders html and text', () => {
   }
 });
 
+test('profile reminders change subject by step, and the last one says so', () => {
+  const emails = [1, 2, 3].map((step) => productEmail({ event: 'profile_reminder', appUrl, name: 'Tolu Adeyemi', data: { step } })!);
+  assert.equal(new Set(emails.map((e) => e.subject)).size, 3);
+  // Drafts can't reach Settings, so the opt-out has to be on the application.
+  for (const email of emails) assert.equal(email.manageUrl, `${appUrl}/app/apply`);
+  assert.match(emails[2].footnote!, /last reminder/);
+  assert.doesNotMatch(emails[0].footnote!, /last reminder/);
+});
+
 test('an unknown event has no template', () => {
   assert.equal(productEmail({ event: 'nope', appUrl, data: {} }), null);
 });

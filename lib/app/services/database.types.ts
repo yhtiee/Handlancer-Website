@@ -214,6 +214,7 @@ export type EmailPreferences = {
   job_alerts: boolean;
   messages: boolean;
   activity: boolean;
+  application_reminders?: boolean;
   updated_at?: string;
 };
 

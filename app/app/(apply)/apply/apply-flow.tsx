@@ -26,6 +26,7 @@ import { providerStatus } from '@/lib/app/domain/artisan-status';
 import { prepareImage } from '@/lib/app/domain/prepare-image';
 import { DEFAULT_RATE_UNIT, formatRateInput, parseRateInput, type RateUnit } from '@/lib/app/domain/rates';
 import { routes } from '@/lib/app/domain/routes';
+import { useApplicationReminders, useSetApplicationReminders } from '@/lib/app/queries/use-email-preferences';
 import { applicationError, deleteWorkPhoto, uploadWorkPhoto } from '@/lib/app/services/applications';
 import type { ServiceOption } from '@/lib/app/service-options';
 import type { Profile } from '@/lib/app/services/database.types';
@@ -170,7 +171,23 @@ function Wizard({ profile, services }: { profile: Profile; services: ServiceOpti
       {step === 2 && <ExperienceStep profile={profile} onDone={next} onBack={back} />}
       {step === 3 && <PhotosStep profile={profile} onDone={next} onBack={back} />}
       {step === 4 && <RulesStep profile={profile} onBack={back} />}
+      {profile.provider_status === 'draft' && <ReminderSwitch />}
     </Frame>
+  );
+}
+
+/** The opt-out those reminder emails link to. */
+function ReminderSwitch() {
+  const { data: on } = useApplicationReminders();
+  const set = useSetApplicationReminders();
+  if (on === undefined) return null;
+  return (
+    <p className="mt-8 text-center text-[13.5px] text-[var(--muted)]">
+      {set.isError ? 'That didn’t save. Try again.' : on ? 'We’ll send up to three email reminders to finish this.' : 'Reminder emails are off.'}{' '}
+      <button type="button" disabled={set.isPending} onClick={() => set.mutate(!on)} className="font-semibold text-[var(--navy)] underline">
+        {on ? 'Stop reminders' : 'Turn them back on'}
+      </button>
+    </p>
   );
 }
 

@@ -73,79 +73,82 @@ export function ReviewForm() {
   const shown = hover || rating;
 
   return (
-    <form onSubmit={submit} noValidate className="mx-auto max-w-[720px]">
-      <PageHeader
-        back={{ href: routes.jobDetail(jobId), label: 'Back to job' }}
-        title={releasing ? 'Check the work and pay' : 'Leave a review'}
-        description={job?.title}
-      />
+    <>
+      <form onSubmit={submit} noValidate className="mx-auto max-w-[720px]">
+        <PageHeader
+          back={{ href: routes.jobDetail(jobId), label: 'Back to job' }}
+          title={releasing ? 'Check the work and pay' : 'Leave a review'}
+          description={job?.title}
+        />
 
-      <div className="space-y-6">
-        {releasing && after.length > 0 && (
-          <Section title="Their after photos">
-            <MediaGallery media={after} />
-          </Section>
-        )}
-
-        <Section title="How was the work?">
-          <div className="flex items-center gap-1" role="radiogroup" aria-label="Rating" onMouseLeave={() => setHover(0)}>
-            {[1, 2, 3, 4, 5].map((n) => (
-              <button
-                key={n}
-                type="button"
-                role="radio"
-                aria-checked={rating === n}
-                aria-label={`${n} star${n > 1 ? 's' : ''}`}
-                onMouseEnter={() => setHover(n)}
-                onClick={() => {
-                  setRating(n);
-                  setError(null);
-                }}
-                className="grid size-11 place-items-center rounded-md hover:bg-[var(--band)]"
-              >
-                <Icon name="star" size={30} className={n <= shown ? 'fill-[#e2a03f] text-[#c77700]' : 'text-[var(--rule-strong)]'} />
-              </button>
-            ))}
-            <span className="ml-2 text-[15px] font-semibold text-[var(--ink)]">{WORDS[shown]}</span>
-          </div>
-          <textarea
-            aria-label="Your review"
-            className="input mt-4 min-h-[110px]"
-            placeholder="Share details about your experience (optional)"
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-          />
-        </Section>
-
-        {releasing && (
-          <section className="card enter space-y-3 p-5">
-            <div className="flex items-baseline justify-between gap-3">
-              <p className="text-[15px] text-[var(--muted)]">Final payment to release</p>
-              <Money amount={amount} className="text-[22px] font-semibold text-[var(--ink)]" />
-            </div>
-            <Note icon="warning">
-              Submitting sends this payment to the artisan and marks the job complete. This can’t be undone — open a dispute instead if something is wrong.
-            </Note>
-          </section>
-        )}
-
-        <ErrorNote>{error}</ErrorNote>
-
-        <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
-          {releasing ? (
-            <button type="button" onClick={() => router.push(routes.disputeJob(jobId))} className="inline-flex items-center gap-2 text-[14px] text-[var(--muted)] hover:text-[var(--ink)]">
-              <Icon name="flag" size={16} />
-              Something wrong? Open a dispute
-            </button>
-          ) : (
-            <span />
+        <div className="space-y-6">
+          {releasing && after.length > 0 && (
+            <Section title="Their after photos">
+              <MediaGallery media={after} />
+            </Section>
           )}
-          <Button type="submit" size="lg" icon={releasing ? 'checkmark-circle' : undefined} loading={pending}>
-            {releasing ? `Approve & release ${formatMoney(amount)}` : 'Submit review'}
-          </Button>
-        </div>
-      </div>
 
+          <Section title="How was the work?">
+            <div className="flex items-center gap-1" role="radiogroup" aria-label="Rating" onMouseLeave={() => setHover(0)}>
+              {[1, 2, 3, 4, 5].map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  role="radio"
+                  aria-checked={rating === n}
+                  aria-label={`${n} star${n > 1 ? 's' : ''}`}
+                  onMouseEnter={() => setHover(n)}
+                  onClick={() => {
+                    setRating(n);
+                    setError(null);
+                  }}
+                  className="grid size-11 place-items-center rounded-md hover:bg-[var(--band)]"
+                >
+                  <Icon name="star" size={30} className={n <= shown ? 'fill-[#e2a03f] text-[#c77700]' : 'text-[var(--rule-strong)]'} />
+                </button>
+              ))}
+              <span className="ml-2 text-[15px] font-semibold text-[var(--ink)]">{WORDS[shown]}</span>
+            </div>
+            <textarea
+              aria-label="Your review"
+              className="input mt-4 min-h-[110px]"
+              placeholder="Share details about your experience (optional)"
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+            />
+          </Section>
+
+          {releasing && (
+            <section className="card enter space-y-3 p-5">
+              <div className="flex items-baseline justify-between gap-3">
+                <p className="text-[15px] text-[var(--muted)]">Final payment to release</p>
+                <Money amount={amount} className="text-[22px] font-semibold text-[var(--ink)]" />
+              </div>
+              <Note icon="warning">
+                Submitting sends this payment to the artisan and marks the job complete. This can’t be undone — open a dispute instead if something is wrong.
+              </Note>
+            </section>
+          )}
+
+          <ErrorNote>{error}</ErrorNote>
+
+          <div className="flex flex-col-reverse gap-2 sm:flex-row sm:items-center sm:justify-between">
+            {releasing ? (
+              <button type="button" onClick={() => router.push(routes.disputeJob(jobId))} className="inline-flex items-center gap-2 text-[14px] text-[var(--muted)] hover:text-[var(--ink)]">
+                <Icon name="flag" size={16} />
+                Something wrong? Open a dispute
+              </button>
+            ) : (
+              <span />
+            )}
+            <Button type="submit" size="lg" icon={releasing ? 'checkmark-circle' : undefined} loading={pending}>
+              {releasing ? `Approve & release ${formatMoney(amount)}` : 'Submit review'}
+            </Button>
+          </div>
+        </div>
+      </form>
+
+      {/* Outside the form above: the PIN dialog has a form of its own, and a form inside a form submits the page. */}
       <PinConfirmDialog
         open={confirming}
         onClose={() => setConfirming(false)}
@@ -171,6 +174,6 @@ export function ReviewForm() {
         message="The artisan has been paid and this job is now complete. Thanks for leaving a review."
         amount={amount}
       />
-    </form>
+    </>
   );
 }

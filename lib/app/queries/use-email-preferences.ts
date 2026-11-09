@@ -35,3 +35,32 @@ export function useUpdateEmailPreferences() {
     onSuccess: (next) => queryClient.setQueryData(key(userId), next),
   });
 }
+
+const remindersKey = (userId?: string) => ['application-reminders', userId] as const;
+
+/** Reminders to finish the application. Switched on the application itself: drafts can't reach Settings. */
+export function useApplicationReminders() {
+  const userId = useAuth().session?.user.id;
+  return useQuery({
+    queryKey: remindersKey(userId),
+    queryFn: async (): Promise<boolean> => {
+      const { data, error } = await supabase.from('email_preferences').select('application_reminders').eq('user_id', userId!).maybeSingle();
+      if (error) throw error;
+      return data?.application_reminders ?? true;
+    },
+    enabled: !!userId,
+  });
+}
+
+export function useSetApplicationReminders() {
+  const userId = useAuth().session?.user.id;
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (on: boolean) => {
+      const { error } = await supabase.from('email_preferences').upsert({ user_id: userId!, application_reminders: on, updated_at: new Date().toISOString() });
+      if (error) throw error;
+      return on;
+    },
+    onSuccess: (on) => queryClient.setQueryData(remindersKey(userId), on),
+  });
+}

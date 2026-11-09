@@ -347,6 +347,35 @@ export function productEmail({ event, appUrl, name, data }: ProductInput): Email
           { kind: 'quote', label: 'Reason', text: text(data.note, 'Contact support to find out why.') },
         ],
       };
+    case 'profile_reminder': {
+      const step = Number(data.step) || 1;
+      const last = step >= 3;
+      return {
+        subject: last ? 'Last reminder: your HandLancer profile' : step === 2 ? 'Customers can’t find you on HandLancer yet' : 'Finish your HandLancer profile so customers can find you',
+        preheader: 'Free to join, no commission, and the money is held before you start.',
+        tag: 'Application',
+        heading: first ? `${first}, finish your` : 'Finish your',
+        emphasis: 'profile',
+        blocks: [
+          { kind: 'p', text: 'Customers can’t find or hire you on HandLancer until your application is in and approved. It takes a few minutes, and whatever you’ve already entered is saved.' },
+          {
+            kind: 'rows',
+            rows: [
+              ['Free to join', 'Joining and quoting cost nothing, and HandLancer takes no commission on your jobs.'],
+              ['Money held first', 'The customer pays the full price into escrow before you start.'],
+              ['Materials money', 'Ask for the materials portion when you need to buy supplies.'],
+              ['More customers', 'Once approved, customers can find you and you can quote on open jobs near you.'],
+              ['Your own link', 'Share your profile with anyone, and they can hire you directly.'],
+            ],
+          },
+          { kind: 'p', text: 'You’ll need your photo or logo, phone number, area, trades, a short description of your experience, and a few photos of past work.' },
+          { kind: 'fine', text: 'Flutterwave charges a small transfer fee when you withdraw to your bank.' },
+        ],
+        cta: { label: 'Finish my profile', url: `${appUrl}/app/apply` },
+        footnote: last ? 'This is the last reminder we’ll send.' : 'You’re getting this because you started an artisan application on HandLancer.',
+        manageUrl: `${appUrl}/app/apply`,
+      };
+    }
 
     // ── Jobs and escrow ──
     case 'quote_received':
@@ -748,6 +777,7 @@ export const PRODUCT_EVENTS = [
   'artisan_approved',
   'artisan_changes_requested',
   'artisan_suspended',
+  'profile_reminder',
   'quote_received',
   'quote_not_selected',
   'job_invited',
