@@ -6,12 +6,13 @@
  * ?provider=) send a direct invite. ?category= preselects the trade.
  */
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { Icon } from '@/components/app/icon';
 import { Avatar, Button, ErrorNote, Field, Note, PageHeader, Section } from '@/components/app/ui';
 import { useAuth } from '@/lib/app/auth';
 import { Categories, type CategoryId } from '@/lib/app/constants/categories';
+import { prepareImage } from '@/lib/app/domain/prepare-image';
 import { routes } from '@/lib/app/domain/routes';
 import { useCreateJob } from '@/lib/app/queries/use-jobs';
 import { useProvider } from '@/lib/app/queries/use-providers';
@@ -46,6 +47,7 @@ export function PostJobForm() {
   const [categoryError, setCategoryError] = useState<string | null>(null);
   const [mediaError, setMediaError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [preparingMedia, setPreparingMedia] = useState(false);
 
   // Default the location to the person's own, once the profile is here.
   const [seeded, setSeeded] = useState(false);
@@ -54,20 +56,34 @@ export function PostJobForm() {
     if (profile.location) setLocation(profile.location);
   }
 
-  // Object URLs for previews are released when the form goes away.
-  useEffect(() => () => media.forEach((m) => URL.revokeObjectURL(m.uri)), [media]);
+  // Object URLs are released when the form goes away, not whenever the list
+  // changes: the picks still in the list are read again at upload.
+  const latestMedia = useRef<Picked[]>([]);
+  useEffect(() => {
+    latestMedia.current = media;
+  }, [media]);
+  useEffect(() => () => latestMedia.current.forEach((m) => URL.revokeObjectURL(m.uri)), []);
 
-  function addMedia(files: FileList | null) {
+  async function addMedia(files: FileList | null) {
     setMediaError(null);
+    const picked = Array.from(files ?? []);
+    if (!picked.length) return;
+    setPreparingMedia(true);
     const next: Picked[] = [];
-    for (const file of Array.from(files ?? [])) {
+    for (const file of picked) {
       if (file.size > MAX_BYTES) {
         setMediaError(`${file.name} is over 50 MB and was skipped.`);
         continue;
       }
-      next.push({ file, uri: URL.createObjectURL(file), kind: file.type.startsWith('video/') ? 'video' : 'photo', mimeType: file.type });
+      try {
+        const ready = await prepareImage(file);
+        next.push({ file: ready, uri: URL.createObjectURL(ready), kind: ready.type.startsWith('video/') ? 'video' : 'photo', mimeType: ready.type });
+      } catch (e) {
+        setMediaError(e instanceof Error ? e.message : 'Could not add that file.');
+      }
     }
     setMedia((prev) => [...prev, ...next]);
+    setPreparingMedia(false);
   }
 
   async function submit(publish: boolean) {
@@ -110,7 +126,7 @@ export function PostJobForm() {
     }
   }
 
-  const busy = createJob.isPending || uploading;
+  const busy = createJob.isPending || uploading || preparingMedia;
 
   return (
     <div className="mx-auto max-w-[760px]">
@@ -258,11 +274,15 @@ export function PostJobForm() {
               </div>
             ))}
             <label className="grid size-[84px] cursor-pointer place-items-center rounded-md border-[1.5px] border-dashed border-[var(--rule-strong)] transition-colors duration-150 hover:border-[var(--ink)] hover:bg-[var(--band)]">
-              <input type="file" accept="image/*,video/*" multiple className="sr-only" onChange={(e) => addMedia(e.target.files)} />
-              <span className="flex flex-col items-center gap-0.5 text-[12.5px] font-semibold text-[var(--ink)]">
-                <Icon name="camera" size={20} />
-                Add
-              </span>
+              <input type="file" accept="image/*,video/*" multiple className="sr-only" disabled={preparingMedia} onChange={(e) => void addMedia(e.target.files)} />
+              {preparingMedia ? (
+                <span className="spinner" aria-label="Preparing photos" />
+              ) : (
+                <span className="flex flex-col items-center gap-0.5 text-[12.5px] font-semibold text-[var(--ink)]">
+                  <Icon name="camera" size={20} />
+                  Add
+                </span>
+              )}
             </label>
           </div>
           {mediaError && <p className="mt-2 text-[13.5px] text-[var(--bad)]">{mediaError}</p>}

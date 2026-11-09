@@ -1,4 +1,5 @@
 import { extensionForMime, readFileBytes } from '@/lib/app/domain/file-bytes';
+import { prepareImage } from '@/lib/app/domain/prepare-image';
 import { supabase } from '@/lib/app/services/supabase';
 
 /**
@@ -9,7 +10,8 @@ import { supabase } from '@/lib/app/services/supabase';
  */
 const BUCKET = 'job-media';
 
-export async function uploadWorkPhoto(userId: string, file: File): Promise<string> {
+export async function uploadWorkPhoto(userId: string, picked: File): Promise<string> {
+  const file = await prepareImage(picked);
   const uri = URL.createObjectURL(file);
   try {
     const bytes = await readFileBytes(uri);

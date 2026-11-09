@@ -10,6 +10,7 @@ import { useRef, useState } from 'react';
 
 import { Dialog } from '@/components/app/controls';
 import { Icon } from '@/components/app/icon';
+import { prepareImage } from '@/lib/app/domain/prepare-image';
 import { useUploadMedia } from '@/lib/app/queries/use-media';
 import type { JobMedia, MediaPhase } from '@/lib/app/services/database.types';
 
@@ -131,26 +132,31 @@ export function ProofUploader({ jobId, media }: { jobId: string; media: JobMedia
   const list = ordered(media);
 
   async function add(phase: MediaPhase, files: FileList | null) {
-    const file = files?.[0];
-    if (!file) return;
+    const picked = Array.from(files ?? []);
+    if (!picked.length) return;
     setError(null);
-    if (file.size > MAX_BYTES) {
-      setError('That file is over 50 MB. Trim the video or pick a photo.');
-      return;
-    }
-    const kind = file.type.startsWith('video/') ? 'video' : 'photo';
-    const uri = URL.createObjectURL(file);
     setBusyPhase(phase);
-    try {
-      await upload.mutateAsync({ phase, asset: { uri, kind, mimeType: file.type } });
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Upload failed.');
-    } finally {
-      URL.revokeObjectURL(uri);
-      setBusyPhase(null);
-      const input = inputs.current[phase];
-      if (input) input.value = '';
+    // One at a time on mobile data; a file that fails doesn't stop the others.
+    for (const file of picked) {
+      if (file.size > MAX_BYTES) {
+        setError(`${file.name} is over 50 MB and was skipped. Trim the video or pick a photo.`);
+        continue;
+      }
+      let uri: string | undefined;
+      try {
+        const ready = await prepareImage(file);
+        const kind = ready.type.startsWith('video/') ? 'video' : 'photo';
+        uri = URL.createObjectURL(ready);
+        await upload.mutateAsync({ phase, asset: { uri, kind, mimeType: ready.type } });
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Upload failed.');
+      } finally {
+        if (uri) URL.revokeObjectURL(uri);
+      }
     }
+    setBusyPhase(null);
+    const input = inputs.current[phase];
+    if (input) input.value = '';
   }
 
   return (
@@ -177,6 +183,7 @@ export function ProofUploader({ jobId, media }: { jobId: string; media: JobMedia
                   }}
                   type="file"
                   accept="image/*,video/*"
+                  multiple
                   className="sr-only"
                   disabled={busy}
                   onChange={(e) => void add(phase, e.target.files)}

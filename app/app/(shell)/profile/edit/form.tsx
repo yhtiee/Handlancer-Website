@@ -14,6 +14,7 @@ import { Icon } from '@/components/app/icon';
 import { ServicePicker } from '@/components/app/service-picker';
 import { Avatar, Button, ErrorNote, Field, Note, PageHeader, Section } from '@/components/app/ui';
 import { useAuth } from '@/lib/app/auth';
+import { prepareImage } from '@/lib/app/domain/prepare-image';
 import { routes } from '@/lib/app/domain/routes';
 import type { ServiceOption } from '@/lib/app/service-options';
 import type { Profile } from '@/lib/app/services/database.types';
@@ -54,16 +55,18 @@ export function EditProfileForm({ services: serviceOptions }: { services: Servic
   async function pickAvatar(file: File | undefined) {
     if (!file || !profile) return;
     setError(null);
-    const uri = URL.createObjectURL(file);
+    let uri: string | undefined;
     setUploadingAvatar(true);
     try {
-      const uploaded = await uploadAvatarImage(profile.id, uri, file.type);
+      const image = await prepareImage(file);
+      uri = URL.createObjectURL(image);
+      const uploaded = await uploadAvatarImage(profile.id, uri, image.type);
       setAvatarUrl(uploaded);
       await refreshProfile();
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not upload photo.');
     } finally {
-      URL.revokeObjectURL(uri);
+      if (uri) URL.revokeObjectURL(uri);
       setUploadingAvatar(false);
     }
   }

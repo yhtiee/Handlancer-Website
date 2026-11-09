@@ -22,6 +22,7 @@ import { useAuth } from '@/lib/app/auth';
 import { Categories } from '@/lib/app/constants/categories';
 import { SUPPORT_EMAIL, SUPPORT_WHATSAPP_DISPLAY } from '@/lib/app/constants/support';
 import { providerStatus } from '@/lib/app/domain/artisan-status';
+import { prepareImage } from '@/lib/app/domain/prepare-image';
 import { routes } from '@/lib/app/domain/routes';
 import { applicationError, deleteWorkPhoto, uploadWorkPhoto } from '@/lib/app/services/applications';
 import type { ServiceOption } from '@/lib/app/service-options';
@@ -214,14 +215,16 @@ function YouStep({ profile, onDone }: { profile: Profile; onDone: () => void }) 
     if (file.size > MAX_PHOTO_BYTES) return setError('That photo is over 10 MB. Pick a smaller one.');
     setUploading(true);
     setError(null);
-    const uri = URL.createObjectURL(file);
+    let uri: string | undefined;
     try {
-      setAvatar(await uploadAvatarImage(profile.id, uri, file.type));
+      const image = await prepareImage(file);
+      uri = URL.createObjectURL(image);
+      setAvatar(await uploadAvatarImage(profile.id, uri, image.type));
       await refreshProfile();
     } catch (e) {
       setError(applicationError(e, 'Could not upload your photo.'));
     } finally {
-      URL.revokeObjectURL(uri);
+      if (uri) URL.revokeObjectURL(uri);
       setUploading(false);
     }
   }
@@ -465,7 +468,8 @@ function PhotosStep({ profile, onDone, onBack }: { profile: Profile; onDone: () 
     let next = [...photos];
     try {
       for (const file of list) {
-        if (!file.type.startsWith('image/')) continue;
+        // Some phones give HEIC photos no type at all, so only a stated non-image is skipped.
+        if (file.type && !file.type.startsWith('image/')) continue;
         if (file.size > MAX_PHOTO_BYTES) {
           setError(`${file.name} is over 10 MB and was skipped.`);
           continue;
