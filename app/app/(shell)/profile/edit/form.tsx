@@ -11,10 +11,12 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { Icon } from '@/components/app/icon';
+import { RateField } from '@/components/app/rate-field';
 import { ServicePicker } from '@/components/app/service-picker';
 import { Avatar, Button, ErrorNote, Field, Note, PageHeader, Section } from '@/components/app/ui';
 import { useAuth } from '@/lib/app/auth';
 import { prepareImage } from '@/lib/app/domain/prepare-image';
+import { DEFAULT_RATE_UNIT, formatRateInput, parseRateInput, type RateUnit } from '@/lib/app/domain/rates';
 import { routes } from '@/lib/app/domain/routes';
 import type { ServiceOption } from '@/lib/app/service-options';
 import type { Profile } from '@/lib/app/services/database.types';
@@ -45,6 +47,8 @@ export function EditProfileForm({ services: serviceOptions }: { services: Servic
   const [services, setServices] = useState<string[]>(profile?.services ?? []);
   const [availability, setAvailability] = useState<Availability>(profile?.availability || 'available');
   const [businessName, setBusinessName] = useState(profile?.business_name ?? '');
+  const [rate, setRate] = useState(formatRateInput(profile?.hourly_rate));
+  const [rateUnit, setRateUnit] = useState<RateUnit>((profile?.rate_unit as RateUnit | null | undefined) ?? DEFAULT_RATE_UNIT);
   const [locating, setLocating] = useState(false);
 
   const [nameError, setNameError] = useState<string | null>(null);
@@ -121,6 +125,7 @@ export function EditProfileForm({ services: serviceOptions }: { services: Servic
         service_radius_km: profile.service_radius_km ?? 20,
         availability,
         business_name: businessName.trim() || null,
+        ...(isProvider ? { hourly_rate: parseRateInput(rate), rate_unit: rateUnit } : {}),
       });
       await refreshProfile();
       router.push(routes.profile);
@@ -185,6 +190,7 @@ export function EditProfileForm({ services: serviceOptions }: { services: Servic
                   <p className="mb-3 text-[14px] font-semibold text-[var(--ink)]">What you do</p>
                   <ServicePicker value={services} onChange={setServices} options={serviceOptions} onLimit={setError} />
                 </div>
+                <RateField amount={rate} unit={rateUnit} onAmount={setRate} onUnit={setRateUnit} />
                 <fieldset>
                   <legend className="mb-2 text-[14px] font-semibold text-[var(--ink)]">Current availability</legend>
                   <div className="flex flex-wrap gap-2">

@@ -66,6 +66,7 @@ export const routes = {
   walletWithdraw: () => '/app/wallet/withdraw',
   walletBank: () => '/app/wallet/bank',
   walletPin: () => '/app/wallet/pin',
+  walletPinForgot: () => '/app/wallet/pin/forgot',
   walletTransaction: (id: string) => `/app/wallet/transactions/${id}`,
 
   // Chat

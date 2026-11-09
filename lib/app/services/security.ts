@@ -105,6 +105,22 @@ export async function setTransferPin(pin: string, currentPin?: string): Promise<
   if (error) throw rpcError(error, 'Could not save your PIN.');
 }
 
+/** Email a one-time code for resetting a forgotten PIN. */
+export async function requestPinReset(): Promise<void> {
+  const { error } = await supabase.rpc('request_pin_reset');
+  if (error) throw rpcError(error, 'Could not send a code.');
+}
+
+/** Replace a forgotten PIN. Postgres checks the code and the account password. */
+export async function resetTransferPin(code: string, password: string, pin: string): Promise<void> {
+  const { error } = await supabase.rpc('reset_transfer_pin', {
+    p_code: code,
+    p_password: password,
+    p_pin: pin,
+  });
+  if (error) throw rpcError(error, 'Could not reset your PIN.');
+}
+
 export async function listBanks(): Promise<Bank[]> {
   const { data, error } = await supabase.functions.invoke<{ banks: Bank[] }>(
     'flutterwave-bank',

@@ -625,6 +625,22 @@ export function productEmail({ event, appUrl, name, data }: ProductInput): Email
         ],
         cta: { label: 'Reset my password', url: `${appUrl}/app/forgot-password` },
       };
+    case 'pin_reset_code': {
+      // Only in the body: subjects and previews show on lock screens.
+      const code = text(data.code);
+      return {
+        subject: 'Reset your HandLancer transfer PIN',
+        preheader: 'Your one-time code is inside.',
+        tag: 'Security',
+        heading: 'Reset your',
+        emphasis: 'PIN',
+        blocks: [
+          { kind: 'p', text: 'Enter this code on the Reset PIN screen, along with your account password. It works once and expires in 15 minutes.' },
+          ...(code ? [{ kind: 'code', code } as Block] : []),
+          { kind: 'fine', text: 'Didn’t ask for this? Don’t share the code with anyone, HandLancer staff included. Someone may be in your account, so reset your password as soon as you can.' },
+        ],
+      };
+    }
     case 'pin_locked':
       return {
         subject: 'Your HandLancer wallet is locked for 15 minutes',
@@ -730,6 +746,7 @@ export const PRODUCT_EVENTS = [
   'withdrawal_paid',
   'withdrawal_failed',
   'pin_changed',
+  'pin_reset_code',
   'pin_locked',
   'bank_changed',
   'account_deleted',

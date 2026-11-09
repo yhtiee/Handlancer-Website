@@ -14,6 +14,7 @@ import { useState } from 'react';
 
 import { ConfirmDialog, Dialog } from '@/components/app/controls';
 import { Icon } from '@/components/app/icon';
+import { ForgotPinLink } from '@/components/app/pin-fields';
 import { useOnline } from '@/components/app/pwa';
 import { Button, Money } from '@/components/app/ui';
 import { formatMoney } from '@/lib/app/domain/money';
@@ -196,6 +197,9 @@ export function PinConfirmDialog({
               setLocalError(null);
             }}
           />
+          <div className="flex justify-center pt-1">
+            <ForgotPinLink />
+          </div>
         </div>
         {locked && <p className="text-[14px] text-[var(--bad)]">Too many incorrect PIN attempts. Try again in a few minutes.</p>}
         {!online && <p className="text-[14px] text-[var(--bad)]">You’re offline. Reconnect to release funds.</p>}

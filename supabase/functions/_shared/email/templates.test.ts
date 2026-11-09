@@ -84,6 +84,13 @@ test('a failed withdrawal says the money came back', () => {
   assert.match(text, /back in your HandLancer wallet/);
 });
 
+test('a PIN reset code is in the body but never the subject or preview', () => {
+  const email = productEmail({ event: 'pin_reset_code', appUrl, data: { code: '048213' } })!;
+  assert.match(render(email, appUrl).text, /048213/);
+  assert.doesNotMatch(email.subject + email.preheader, /048213/);
+  assert.equal(email.manageUrl, undefined);
+});
+
 test('an open budget is not shown as zero naira', () => {
   const { text } = render(productEmail({ event: 'job_alert', appUrl, data: { job_id: jobId, title: 'x', budget: null } })!, appUrl);
   assert.match(text, /Budget: Open/);

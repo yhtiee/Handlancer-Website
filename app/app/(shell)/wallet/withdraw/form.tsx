@@ -11,6 +11,7 @@ import { useState } from 'react';
 
 import { SuccessDialog } from '@/components/app/escrow';
 import { Icon } from '@/components/app/icon';
+import { ForgotPinLink } from '@/components/app/pin-fields';
 import { useOnline } from '@/components/app/pwa';
 import { Button, ErrorNote, Field, Money, PageHeader, Section, Skeleton } from '@/components/app/ui';
 import { routes } from '@/lib/app/domain/routes';
@@ -150,6 +151,7 @@ export function WithdrawForm() {
                     setPinError(null);
                   }}
                 />
+                <ForgotPinLink />
               </Field>
             </div>
           </Section>

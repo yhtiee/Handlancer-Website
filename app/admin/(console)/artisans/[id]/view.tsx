@@ -7,6 +7,7 @@ import { Details, Figure, PageHeader, Section, StatusBadge } from '@/components/
 import { formatDate, formatDateTime, formatNaira, humanize } from '@/lib/admin/format';
 import { useArtisan, useReviewArtisan } from '@/lib/admin/query/hooks';
 import type { Profile } from '@/lib/admin/types';
+import { rateUnitLabel } from '@/lib/app/domain/rates';
 import { serviceLabel } from '@/lib/app/domain/trades';
 
 import { ARTISAN_STATUS_LABEL } from '../view';
@@ -105,7 +106,7 @@ export function ArtisanView({ id }: { id: string }) {
                 { label: 'Area', value: p.location },
                 { label: 'Trades & services', value: p.services?.length ? p.services.map(serviceLabel).join(', ') : '—' },
                 { label: 'Experience', value: p.years_experience != null ? `${p.years_experience} yrs` : '—' },
-                { label: 'Hourly rate', value: p.hourly_rate ? <Figure>{formatNaira(p.hourly_rate)}</Figure> : 'By quote' },
+                { label: 'Rate', value: p.hourly_rate ? <><Figure>{formatNaira(p.hourly_rate)}</Figure> {rateUnitLabel(p.rate_unit)}</> : 'By quote' },
                 { label: 'Business name', value: p.business_name },
                 { label: 'Availability', value: humanize(p.availability) },
                 { label: 'Rules accepted', value: p.provider_terms_accepted_at ? formatDateTime(p.provider_terms_accepted_at) : 'Not yet' },

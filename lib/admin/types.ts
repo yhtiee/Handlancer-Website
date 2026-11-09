@@ -42,6 +42,7 @@ export type Profile = {
   services: string[] | null;
   rating: number | null;
   hourly_rate: number | null;
+  rate_unit?: string | null;
   years_experience: number | null;
   latitude?: number | null;
   longitude?: number | null;

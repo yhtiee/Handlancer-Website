@@ -19,8 +19,9 @@ import { timeAgo } from '@/lib/app/domain/date';
 import { jobNextStep, providerNextStep } from '@/lib/app/domain/job-state';
 import { formatMoney } from '@/lib/app/domain/money';
 import { categoryPhoto, providerImageFallback } from '@/lib/app/domain/provider-images';
+import { rateUnitLabel } from '@/lib/app/domain/rates';
 import { routes } from '@/lib/app/domain/routes';
-import { serviceLabel } from '@/lib/app/domain/trades';
+import { mainServiceLabel } from '@/lib/app/domain/trades';
 import { useProvider } from '@/lib/app/queries/use-providers';
 import { useJobQuotes } from '@/lib/app/queries/use-quotes';
 import { useMyReviewForJob } from '@/lib/app/queries/use-reviews';
@@ -254,7 +255,7 @@ export function OpenJobRow({ job }: { job: Job }) {
  */
 export function ProviderRow({ provider }: { provider: Profile }) {
   const rating = (provider.rating ?? 0) > 0 ? provider.rating.toFixed(1) : 'New';
-  const meta = [provider.services?.[0] && serviceLabel(provider.services[0]), provider.location, rating].filter(Boolean).join(' · ');
+  const meta = [mainServiceLabel(provider.services), provider.location, rating].filter(Boolean).join(' · ');
   return (
     <Link
       href={routes.providerProfile(provider.id)}
@@ -271,7 +272,7 @@ export function ProviderRow({ provider }: { provider: Profile }) {
       {provider.hourly_rate != null && (
         <span className="hidden shrink-0 text-right sm:block">
           <span className="figure block text-[14px] font-medium text-[var(--ink)]">{formatMoney(provider.hourly_rate)}</span>
-          <span className="text-[12px] text-[var(--muted)]">per hour</span>
+          <span className="text-[12px] text-[var(--muted)]">{rateUnitLabel(provider.rate_unit)}</span>
         </span>
       )}
       <Icon name="chevron-forward" size={16} className="shrink-0 text-[var(--muted)]" />

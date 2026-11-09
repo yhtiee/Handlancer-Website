@@ -18,8 +18,9 @@ import { Categories } from '@/lib/app/constants/categories';
 import { useAuth } from '@/lib/app/auth';
 import { formatMoney } from '@/lib/app/domain/money';
 import { providerImageFallback } from '@/lib/app/domain/provider-images';
+import { rateUnitLabel } from '@/lib/app/domain/rates';
 import { routes } from '@/lib/app/domain/routes';
-import { serviceLabel } from '@/lib/app/domain/trades';
+import { mainServiceLabel, serviceLabel, withoutOther } from '@/lib/app/domain/trades';
 import { useStartConversation } from '@/lib/app/queries/use-chat';
 import { useProviderMedia } from '@/lib/app/queries/use-media';
 import { useProvider } from '@/lib/app/queries/use-providers';
@@ -61,11 +62,11 @@ export function ProviderView() {
   }
 
   const first = provider.name?.trim().split(' ')[0] ?? 'them';
-  const tradeIds = (provider.services ?? []).filter((s) => TRADE_IDS.has(s));
-  const listed = (provider.services ?? []).filter((s) => !TRADE_IDS.has(s));
-  // The main trade is the first one picked, skipping the catch-all "Other".
-  const mainTrade = tradeIds.find((t) => t !== 'other') ?? tradeIds[0] ?? listed[0];
-  const trade = mainTrade ? serviceLabel(mainTrade) : undefined;
+  const offered = withoutOther(provider.services);
+  const tradeIds = offered.filter((s) => TRADE_IDS.has(s));
+  const listed = offered.filter((s) => !TRADE_IDS.has(s));
+  const mainTrade = tradeIds[0];
+  const trade = mainServiceLabel(provider.services);
   const portfolio = (provider.work_photos ?? []).map(
     (url, i): JobMedia => ({ id: `portfolio-${i}`, url, kind: 'photo', phase: 'after', job_id: '', provider_id: provider.id, created_at: provider.created_at }),
   );
@@ -136,7 +137,7 @@ export function ProviderView() {
             {' · '}
             {provider.hourly_rate ? (
               <>
-                <b className="figure font-semibold text-[var(--ink)]">From {formatMoney(provider.hourly_rate)}</b> an hour
+                <b className="figure font-semibold text-[var(--ink)]">From {formatMoney(provider.hourly_rate)}</b> {rateUnitLabel(provider.rate_unit)}
               </>
             ) : (
               'priced by quote'
@@ -248,7 +249,7 @@ export function ProviderView() {
               items={[
                 { label: 'Area', value: provider.location || '—' },
                 { label: 'Experience', value: years != null ? `${years} ${years === 1 ? 'year' : 'years'}` : '—' },
-                { label: 'Rate', value: provider.hourly_rate ? <Money amount={provider.hourly_rate} className="text-[var(--ink)]" /> : 'Priced by quote' },
+                { label: 'Rate', value: provider.hourly_rate ? <><Money amount={provider.hourly_rate} className="text-[var(--ink)]" /> {rateUnitLabel(provider.rate_unit)}</> : 'Priced by quote' },
                 { label: 'Rating', value: reviewCount ? `${provider.rating.toFixed(1)} from ${reviewCount} ${reviewCount === 1 ? 'review' : 'reviews'}` : 'No reviews yet' },
                 ...(provider.business_name ? [{ label: 'Business', value: provider.business_name }] : []),
                 { label: 'Availability', value: availability?.label ?? '—' },

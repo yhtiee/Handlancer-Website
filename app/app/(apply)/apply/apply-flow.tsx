@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react';
 
 import { BrandLogo } from '@/components/admin/brand-logo';
 import { Icon } from '@/components/app/icon';
+import { RateField } from '@/components/app/rate-field';
 import { ServicePicker } from '@/components/app/service-picker';
 import { Avatar, Button, ButtonLink, ErrorNote, Field, Note } from '@/components/app/ui';
 import { useAuth } from '@/lib/app/auth';
@@ -23,6 +24,7 @@ import { Categories } from '@/lib/app/constants/categories';
 import { SUPPORT_EMAIL, SUPPORT_WHATSAPP_DISPLAY } from '@/lib/app/constants/support';
 import { providerStatus } from '@/lib/app/domain/artisan-status';
 import { prepareImage } from '@/lib/app/domain/prepare-image';
+import { DEFAULT_RATE_UNIT, formatRateInput, parseRateInput, type RateUnit } from '@/lib/app/domain/rates';
 import { routes } from '@/lib/app/domain/routes';
 import { applicationError, deleteWorkPhoto, uploadWorkPhoto } from '@/lib/app/services/applications';
 import type { ServiceOption } from '@/lib/app/service-options';
@@ -365,7 +367,8 @@ const AVAILABILITY: { value: Availability; label: string }[] = [
 function ExperienceStep({ profile, onDone, onBack }: { profile: Profile; onDone: () => void; onBack: () => void }) {
   const { save, saving, error } = useSave(profile);
   const [years, setYears] = useState(profile.years_experience != null ? String(profile.years_experience) : '');
-  const [rate, setRate] = useState(profile.hourly_rate ? profile.hourly_rate.toLocaleString('en-NG') : '');
+  const [rate, setRate] = useState(formatRateInput(profile.hourly_rate));
+  const [rateUnit, setRateUnit] = useState<RateUnit>((profile.rate_unit as RateUnit | null | undefined) ?? DEFAULT_RATE_UNIT);
   const [bio, setBio] = useState(profile.bio ?? '');
   const [business, setBusiness] = useState(profile.business_name ?? '');
   const [availability, setAvailability] = useState<Availability>(profile.availability === 'offline' || !profile.availability ? 'available' : profile.availability);
@@ -379,11 +382,11 @@ function ExperienceStep({ profile, onDone, onBack }: { profile: Profile; onDone:
     if (bio.trim().length < MIN_BIO) next.bio = `A few sentences, please — at least ${MIN_BIO} characters.`;
     setErrors(next);
     if (Object.keys(next).length) return;
-    const r = Number(rate.replace(/\D/g, ''));
     void save(
       {
         years_experience: Math.round(y),
-        hourly_rate: r > 0 ? r : null,
+        hourly_rate: parseRateInput(rate),
+        rate_unit: rateUnit,
         bio: bio.trim(),
         business_name: business.trim() || null,
         availability,
@@ -400,22 +403,7 @@ function ExperienceStep({ profile, onDone, onBack }: { profile: Profile; onDone:
           <Field label="Years of experience" htmlFor="years" error={errors.years}>
             <input id="years" className="input figure !h-11" inputMode="numeric" placeholder="e.g. 6" value={years} onChange={(e) => setYears(e.target.value.replace(/\D/g, '').slice(0, 2))} />
           </Field>
-          <Field label="Starting hourly rate" htmlFor="rate" optional hint="Leave blank to price every job by quote.">
-            <div className="relative">
-              <span className="figure pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted)]">₦</span>
-              <input
-                id="rate"
-                className="input figure !h-11 pl-7"
-                inputMode="numeric"
-                placeholder="3,000"
-                value={rate}
-                onChange={(e) => {
-                  const d = e.target.value.replace(/\D/g, '');
-                  setRate(d ? Number(d).toLocaleString('en-NG') : '');
-                }}
-              />
-            </div>
-          </Field>
+          <RateField amount={rate} unit={rateUnit} onAmount={setRate} onUnit={setRateUnit} />
         </div>
         <Field label="About your work" htmlFor="bio" error={errors.bio} hint={`${bio.trim().length} / ${MIN_BIO}+ characters. What you do best, jobs you’re proud of, tools you bring.`}>
           <textarea

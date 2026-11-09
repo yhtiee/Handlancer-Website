@@ -42,7 +42,7 @@ import { formatMoney } from '@/lib/app/domain/money';
 import { categoryPhoto, providerImageFallback } from '@/lib/app/domain/provider-images';
 import { canQuote } from '@/lib/app/domain/artisan-status';
 import { routes } from '@/lib/app/domain/routes';
-import { serviceLabel } from '@/lib/app/domain/trades';
+import { mainServiceLabel } from '@/lib/app/domain/trades';
 import { useStartConversation } from '@/lib/app/queries/use-chat';
 import { useJobDispute } from '@/lib/app/queries/use-disputes';
 import { useJob, useUpdateJobStatus } from '@/lib/app/queries/use-jobs';
@@ -290,7 +290,7 @@ function ClientJob({ job }: { job: JobWithOwner }) {
                 <Avatar src={provider.avatar_url} name={provider.name} size={52} />
                 <div className="min-w-0">
                   <p className="truncate font-semibold text-[var(--ink)]">{provider.name ?? 'Your artisan'}</p>
-                  <p className="truncate text-[13.5px] text-[var(--muted)]">{provider.services?.[0] ? serviceLabel(provider.services[0]) : 'Artisan'}</p>
+                  <p className="truncate text-[13.5px] text-[var(--muted)]">{mainServiceLabel(provider.services) ?? 'Artisan'}</p>
                   <Rating value={provider.rating} />
                 </div>
               </Link>

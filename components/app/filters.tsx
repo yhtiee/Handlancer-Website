@@ -267,7 +267,7 @@ export function ProviderFilterDialog({
         </div>
       </FilterSection>
 
-      <FilterSection title="Max hourly rate">
+      <FilterSection title="Max rate">
         <NairaInput label="Up to" value={draft.maxRate} onChange={(v) => set({ maxRate: v })} />
       </FilterSection>
 

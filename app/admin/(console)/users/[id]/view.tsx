@@ -5,6 +5,7 @@ import { NotFound, QueryError, ViewSkeleton, isNotFound } from '@/components/adm
 import { Details, Figure, PageHeader, Section, StatusBadge } from '@/components/admin/ui';
 import { formatDate, formatDateTime, formatNaira, humanize } from '@/lib/admin/format';
 import { useUser } from '@/lib/admin/query/hooks';
+import { rateUnitLabel } from '@/lib/app/domain/rates';
 
 export function UserView({ id }: { id: string }) {
   const { data, error, refetch } = useUser(id);
@@ -55,7 +56,7 @@ export function UserView({ id }: { id: string }) {
                       { label: 'Business name', value: p.business_name },
                       { label: 'Availability', value: humanize(p.availability) },
                       { label: 'Rating', value: p.rating ? <Figure>{Number(p.rating).toFixed(1)}</Figure> : '—' },
-                      { label: 'Hourly rate', value: p.hourly_rate ? <Figure>{formatNaira(p.hourly_rate)}</Figure> : '—' },
+                      { label: 'Rate', value: p.hourly_rate ? <><Figure>{formatNaira(p.hourly_rate)}</Figure> {rateUnitLabel(p.rate_unit)}</> : '—' },
                       { label: 'Experience', value: p.years_experience != null ? `${p.years_experience} yrs` : '—' },
                       { label: 'Services', value: p.services?.length ? p.services.join(', ') : '—' },
                     ]

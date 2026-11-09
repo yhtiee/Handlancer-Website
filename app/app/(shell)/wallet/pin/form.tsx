@@ -9,27 +9,11 @@ import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 import { SuccessDialog } from '@/components/app/escrow';
-import { Button, ErrorNote, Field, Note, PageHeader, Section } from '@/components/app/ui';
+import { ForgotPinLink, PinInput, PinRules } from '@/components/app/pin-fields';
+import { Button, ErrorNote, Note, PageHeader, Section } from '@/components/app/ui';
+import { pinProblem } from '@/lib/app/domain/pin-rules';
 import { routes } from '@/lib/app/domain/routes';
 import { useSetTransferPin, useWalletSecurity } from '@/lib/app/queries/use-wallet-security';
-
-function PinInput({ id, label, value, onChange }: { id: string; label: string; value: string; onChange: (v: string) => void }) {
-  return (
-    <Field label={label} htmlFor={id}>
-      <input
-        id={id}
-        className="input figure !h-12 max-w-[200px] tracking-[0.5em]"
-        type="password"
-        inputMode="numeric"
-        autoComplete="off"
-        maxLength={4}
-        placeholder="••••"
-        value={value}
-        onChange={(e) => onChange(e.target.value.replace(/[^0-9]/g, '').slice(0, 4))}
-      />
-    </Field>
-  );
-}
 
 export function PinForm() {
   const router = useRouter();
@@ -47,7 +31,8 @@ export function PinForm() {
     e.preventDefault();
     setError(null);
     if (changing && currentPin.length !== 4) return setError('Enter your current PIN');
-    if (!/^\d{4}$/.test(pin)) return setError('Choose a 4-digit PIN');
+    const problem = pinProblem(pin);
+    if (problem) return setError(problem);
     if (pin !== confirmPin) return setError('The two PINs do not match');
     try {
       await savePin.mutateAsync({ pin, currentPin: changing ? currentPin : undefined });
@@ -66,9 +51,10 @@ export function PinForm() {
         </Note>
         <Section title="Your PIN">
           <div className="space-y-5">
-            {changing && <PinInput id="current" label="Current PIN" value={currentPin} onChange={setCurrentPin} />}
+            {changing && <PinInput id="current" label="Current PIN" value={currentPin} onChange={setCurrentPin} after={<ForgotPinLink />} />}
             <PinInput id="new" label={changing ? 'New PIN' : 'Choose a PIN'} value={pin} onChange={setPin} />
             <PinInput id="confirm" label="Confirm PIN" value={confirmPin} onChange={setConfirmPin} />
+            <PinRules pin={pin} confirm={confirmPin} />
           </div>
         </Section>
         <ErrorNote>{error}</ErrorNote>

@@ -53,7 +53,9 @@ export type Profile = {
   is_verified?: boolean;
   services: string[];
   rating: number;
+  /** The starting price, despite the name. `rate_unit` says what it's charged per. */
   hourly_rate: number | null;
+  rate_unit?: string | null;
   years_experience: number | null;
   push_token: string | null;
   /** Set when the person deleted their account; the row stays as "Deleted user". */
@@ -259,6 +261,11 @@ export type Database = {
       };
       set_transfer_pin: {
         Args: { p_pin: string; p_current_pin: string | null };
+        Returns: undefined;
+      };
+      request_pin_reset: { Args: Record<string, never>; Returns: undefined };
+      reset_transfer_pin: {
+        Args: { p_code: string; p_password: string; p_pin: string };
         Returns: undefined;
       };
       request_materials_release: { Args: { p_job_id: string }; Returns: undefined };

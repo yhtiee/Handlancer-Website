@@ -5,6 +5,8 @@ import { useAuth } from '@/lib/app/auth';
 import {
   getWalletSecurity,
   listBanks,
+  requestPinReset,
+  resetTransferPin,
   saveBankAccount,
   setTransferPin,
 } from '@/lib/app/services/security';
@@ -36,6 +38,19 @@ export function useSetTransferPin() {
   return useMutation({
     mutationFn: ({ pin, currentPin }: { pin: string; currentPin?: string }) =>
       setTransferPin(pin, currentPin),
+    onSuccess: () => qc.invalidateQueries({ queryKey: securityKey }),
+  });
+}
+
+export function useRequestPinReset() {
+  return useMutation({ mutationFn: requestPinReset });
+}
+
+export function useResetTransferPin() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: ({ code, password, pin }: { code: string; password: string; pin: string }) =>
+      resetTransferPin(code, password, pin),
     onSuccess: () => qc.invalidateQueries({ queryKey: securityKey }),
   });
 }
