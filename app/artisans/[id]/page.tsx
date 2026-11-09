@@ -33,19 +33,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const trade = mainServiceLabel(provider.services);
   const place = provider.location?.trim();
   const description = `Hire ${name} on HandLancer${place ? ` in ${place}` : ''}. Your money stays in escrow until you approve the work.`;
-  const meta = buildMetadata({
+  return buildMetadata({
     path: routes.publicProvider(provider.id),
     title: trade ? `${name}, ${trade}` : name,
     description,
     noindex: true,
+    shareImage: { url: `${routes.publicProvider(provider.id)}/opengraph-image`, alt: `Hire ${name} on HandLancer` },
   });
-  if (!provider.avatar_url) return meta;
-  // A square headshot: the wide card layout would crop it badly.
-  return {
-    ...meta,
-    openGraph: { ...meta.openGraph, images: [{ url: provider.avatar_url, alt: name }] },
-    twitter: { ...meta.twitter, card: 'summary', images: [provider.avatar_url] },
-  };
 }
 
 const heading = 'mb-3 text-[20px]';

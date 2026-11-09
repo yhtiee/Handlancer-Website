@@ -27,7 +27,17 @@ export type PageSeo = {
   absoluteTitle?: boolean;
   /** Keep the page out of the index until it has genuinely unique content. */
   noindex?: boolean;
+  /** A 1200×630 PNG of this page's own, in place of the site's card. */
+  shareImage?: { url: string; alt: string };
 };
+
+/*
+ * The site's share card. Needed explicitly: app/opengraph-image.png applies only
+ * to the root segment, so a page that sets its own `openGraph` would otherwise
+ * be posted with no image at all.
+ */
+const SHARE_IMAGE_ALT = 'HandLancer — hire trusted artisans in Nigeria and hold the money in escrow until the work is done.';
+const SHARE_IMAGE_SIZE = { width: 1200, height: 630, type: 'image/png' };
 
 /** Absolute URL for a route path — for sitemaps and JSON-LD, which cannot use
  *  metadataBase resolution. */
@@ -42,9 +52,12 @@ export function buildMetadata({
   description,
   absoluteTitle,
   noindex,
+  shareImage,
 }: PageSeo): Metadata {
   // What the social card shows: the template only applies to <title>.
   const socialTitle = absoluteTitle ? title : `${title} | ${SITE.name}`;
+  const ogImage = { ...SHARE_IMAGE_SIZE, ...(shareImage ?? { url: '/opengraph-image.png', alt: SHARE_IMAGE_ALT }) };
+  const twitterImage = { ...SHARE_IMAGE_SIZE, ...(shareImage ?? { url: '/twitter-image.png', alt: SHARE_IMAGE_ALT }) };
 
   return {
     title: absoluteTitle ? { absolute: title } : title,
@@ -57,11 +70,13 @@ export function buildMetadata({
       url: path,
       title: socialTitle,
       description,
+      images: [ogImage],
     },
     twitter: {
       card: 'summary_large_image',
       title: socialTitle,
       description,
+      images: [twitterImage],
     },
     robots: noindex
       ? { index: false, follow: true }
