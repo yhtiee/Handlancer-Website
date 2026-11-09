@@ -16,6 +16,7 @@ import { Thumb } from '@/components/app/rows';
 import { Button, ButtonLink, Details, EmptyState, Money, Section, Skeleton, Tape } from '@/components/app/ui';
 import { Categories } from '@/lib/app/constants/categories';
 import { useAuth } from '@/lib/app/auth';
+import { AVAILABILITY } from '@/lib/app/domain/availability';
 import { formatMoney } from '@/lib/app/domain/money';
 import { providerImageFallback } from '@/lib/app/domain/provider-images';
 import { rateUnitLabel } from '@/lib/app/domain/rates';
@@ -29,13 +30,6 @@ import type { JobMedia, Profile } from '@/lib/app/services/database.types';
 import type { ReviewWithReviewer } from '@/lib/app/services/reviews';
 
 const TRADE_IDS = new Set<string>(Categories.map((c) => c.id));
-
-const AVAILABILITY: Record<NonNullable<Profile['availability']>, { label: string; dot: string }> = {
-  available: { label: 'Available now', dot: 'bg-[var(--ok)]' },
-  on_call: { label: 'On call', dot: 'bg-[var(--ok)]' },
-  busy: { label: 'Busy this week', dot: 'bg-[var(--warn)]' },
-  offline: { label: 'Not taking work', dot: 'bg-[var(--rule-strong)]' },
-};
 
 type Case = { jobId: string; media: JobMedia[]; before?: JobMedia; after?: JobMedia; review?: ReviewWithReviewer; at: string };
 

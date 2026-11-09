@@ -128,6 +128,16 @@ export function PostJobForm() {
 
   const busy = createJob.isPending || uploading || preparingMedia;
 
+  // An artisan trying their own shared link shouldn't be able to invite themselves.
+  if (providerId && providerId === session?.user.id) {
+    return (
+      <div className="mx-auto max-w-[760px]">
+        <PageHeader title="This is your own link" back={{ href: routes.profile, label: 'Profile' }} />
+        <Note icon="information-circle">Customers who open your link land here to describe their job and send it to you.</Note>
+      </div>
+    );
+  }
+
   return (
     <div className="mx-auto max-w-[760px]">
       <PageHeader

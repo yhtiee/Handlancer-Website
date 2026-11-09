@@ -13,7 +13,7 @@ import { useEffect, useState } from 'react';
 
 import { Button, ErrorNote, Field } from '@/components/app/ui';
 import { useAuth } from '@/lib/app/auth';
-import { routes } from '@/lib/app/domain/routes';
+import { onboardingPath, routes } from '@/lib/app/domain/routes';
 import { resendConfirmation, verifyEmailCode } from '@/lib/app/services/auth';
 
 const RESEND_SECONDS = 60;
@@ -23,7 +23,7 @@ export function VerifyEmailForm() {
   const params = useSearchParams();
   const email = params.get('email') ?? '';
   const role = params.get('role');
-  const onboarding = role === 'user' || role === 'provider' ? `${routes.onboarding}?role=${role}` : routes.onboarding;
+  const onboarding = onboardingPath(role === 'user' || role === 'provider' ? role : null, params.get('next'));
   const { loading: authLoading, session } = useAuth();
 
   const [code, setCode] = useState('');

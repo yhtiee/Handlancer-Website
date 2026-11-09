@@ -10,7 +10,7 @@ import { useEffect, useState } from 'react';
 import { Icon } from '@/components/app/icon';
 import { Button, ErrorNote, Field } from '@/components/app/ui';
 import { useAuth } from '@/lib/app/auth';
-import { routes } from '@/lib/app/domain/routes';
+import { routes, safeNext } from '@/lib/app/domain/routes';
 import { createProfile } from '@/lib/app/services/auth';
 import type { UserRole } from '@/lib/app/services/database.types';
 
@@ -31,6 +31,7 @@ export function RoleForm() {
   const router = useRouter();
   const params = useSearchParams();
   const preset = params.get('role');
+  const next = safeNext(params.get('next'), routes.home);
   const { loading: authLoading, session, profile, refreshProfile } = useAuth();
 
   const [role, setRole] = useState<UserRole | null>(preset === 'user' || preset === 'provider' ? preset : null);
@@ -41,8 +42,8 @@ export function RoleForm() {
   useEffect(() => {
     if (authLoading || loading) return;
     if (!session) router.replace(routes.signIn);
-    else if (profile) router.replace(routes.home);
-  }, [authLoading, loading, session, profile, router]);
+    else if (profile) router.replace(next);
+  }, [authLoading, loading, session, profile, next, router]);
 
   async function handleContinue(e: React.FormEvent) {
     e.preventDefault();
@@ -63,7 +64,7 @@ export function RoleForm() {
       await refreshProfile();
       // Artisans go straight into their application: nothing they can do
       // as an artisan works until it has been reviewed.
-      router.replace(role === 'provider' ? routes.apply : routes.home);
+      router.replace(role === 'provider' ? routes.apply : next);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Could not save your profile.');
       setLoading(false);

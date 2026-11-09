@@ -8,8 +8,10 @@
 import Link from 'next/link';
 
 import { Icon, type IconName } from '@/components/app/icon';
+import { ShareProfile } from '@/components/app/share-profile';
 import { Avatar, Button, Rating } from '@/components/app/ui';
 import { useAuth } from '@/lib/app/auth';
+import { canQuote } from '@/lib/app/domain/artisan-status';
 import { routes } from '@/lib/app/domain/routes';
 import { useUnreadCount } from '@/lib/app/queries/use-notifications';
 
@@ -41,6 +43,8 @@ export function ProfileView() {
           </Link>
         )}
       </header>
+
+      {profile && canQuote(profile) && <ShareProfile providerId={profile.id} />}
 
       <nav className="card enter overflow-hidden" aria-label="Account">
         <ul className="divide-y divide-[var(--rule)]">

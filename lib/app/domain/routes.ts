@@ -15,6 +15,16 @@ export function safeNext(next: string | null, fallback: string) {
   return next && next.startsWith('/app') && !next.startsWith('//') && !next.includes('\\') ? next : fallback;
 }
 
+/** Onboarding, carrying the role and where to go once it's done. */
+export function onboardingPath(role: string | null, next: string | null) {
+  const query = new URLSearchParams();
+  if (role) query.set('role', role);
+  const destination = safeNext(next, '');
+  if (destination) query.set('next', destination);
+  const search = query.toString();
+  return search ? `/app/onboarding?${search}` : '/app/onboarding';
+}
+
 export const routes = {
   home: '/app',
   signIn: '/app/sign-in',
@@ -47,6 +57,10 @@ export const routes = {
   browseProviders: '/app/providers',
   browseProvidersIn: (service: string) => `/app/providers?service=${service}`,
   providerProfile: (id: string) => `/app/providers/${id}`,
+  /** The page an artisan shares. Outside /app: it works without an account. */
+  publicProvider: (id: string) => `/artisans/${id}`,
+  /** "Hire" on that page: sign up as a client, then straight to the job request. */
+  hireFromShare: (providerId: string) => `/app/sign-in?role=user&next=${encodeURIComponent(routes.postDirectJob(providerId))}`,
 
   // Provider · Find Work (same job URL; the page picks the bidding view)
   findWork: '/app/find-work',

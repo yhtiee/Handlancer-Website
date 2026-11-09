@@ -10,7 +10,7 @@ import { PageHeader } from '@/components/page-header';
 import { LegalBody, type LegalSection } from '@/components/legal';
 
 const PATH = '/privacy';
-const EFFECTIVE = '2026-10-08';
+const EFFECTIVE = '2026-11-09';
 
 const trail = [
   { name: 'Home', path: '/' },
@@ -169,6 +169,7 @@ const SECTIONS: LegalSection[] = [
     ],
     list: [
       'Providers: your public profile, meaning your name, photo, bio, area, trades, rate, experience, availability, rating, reviews, verified badge and proof-of-work photos. Customers can also see roughly how far away you are.',
+      'Approved providers also have a shareable profile page. Anyone with its link can see your name, photo, business name, bio, area, trades, rate, experience, availability, rating, verified badge and the work photos from your application, without an account. We ask search engines not to list it, and it never shows your phone number, email or the text of reviews.',
       'Customers: your name and photo, and any job you post publicly, including its description, budget, area and photos, are visible to providers. A direct job request is seen only by the provider you send it to.',
       'Messages are visible only to the two people in the conversation, and to HandLancer staff when we are handling a dispute or a support request about that job.',
       'Your email address, phone number, bank details, wallet balance and transaction history are not shown to other users.',

@@ -15,7 +15,7 @@ import { Segmented } from '@/components/app/controls';
 import { PasswordInput } from '@/components/app/password-input';
 import { useAuth } from '@/lib/app/auth';
 import { mustApply } from '@/lib/app/domain/artisan-status';
-import { routes, safeNext } from '@/lib/app/domain/routes';
+import { onboardingPath, routes, safeNext } from '@/lib/app/domain/routes';
 import { getProfileById, signInWithEmail, signUpWithEmail } from '@/lib/app/services/auth';
 
 type Mode = 'signin' | 'signup';
@@ -24,7 +24,10 @@ export function SignInForm() {
   const router = useRouter();
   const params = useSearchParams();
   const role = params.get('role');
-  const next = safeNext(params.get('next'), routes.home);
+  const requested = safeNext(params.get('next'), '');
+  const next = requested || routes.home;
+  // A new account takes the destination through email confirmation and onboarding.
+  const onboarding = onboardingPath(role, requested);
   const { loading: authLoading, session, profile } = useAuth();
 
   // Arriving with a role means they are new here; a plain visit is a sign-in.
@@ -41,14 +44,13 @@ export function SignInForm() {
 
   // Already signed in (a bookmarked sign-in page): skip the form.
   useEffect(() => {
-    if (!authLoading && session && !loading) router.replace(!profile ? routes.onboarding : mustApply(profile) ? routes.apply : next);
-  }, [authLoading, session, profile, loading, next, router]);
-
-  const onboarding = role ? `${routes.onboarding}?role=${role}` : routes.onboarding;
+    if (!authLoading && session && !loading) router.replace(!profile ? onboarding : mustApply(profile) ? routes.apply : next);
+  }, [authLoading, session, profile, loading, next, onboarding, router]);
 
   function goVerify() {
     const query = new URLSearchParams({ email: email.trim() });
     if (role) query.set('role', role);
+    if (requested) query.set('next', requested);
     router.push(`${routes.verifyEmail}?${query}`);
   }
 
