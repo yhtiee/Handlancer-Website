@@ -53,11 +53,13 @@ export function Button({
   type = 'button',
   disabled,
   onClick,
+  form,
   ...props
 }: ButtonProps & Pick<React.ButtonHTMLAttributes<HTMLButtonElement>, 'type' | 'disabled' | 'onClick' | 'form'>) {
   return (
     <button
       type={type}
+      form={form}
       onClick={onClick}
       disabled={disabled || props.loading}
       aria-busy={props.loading || undefined}
